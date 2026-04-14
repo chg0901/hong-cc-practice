@@ -1,0 +1,67 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/node -c \"console.log\\(''''Syntax OK''''\\)\" static/svg/schematic_generator.js)",
+      "Bash(NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/node -c \"console.log\\(''''Syntax OK''''\\)\" static/svg/device_icons.js)",
+      "Bash(pkill -f \"smart_energy_platform.py\")",
+      "Bash(D:/miniconda3/envs/ene/python.exe -m graphify --help)",
+      "Bash(D:/miniconda3/envs/ene/python.exe -c \"import graphify\")",
+      "mcp__plugin_playwright_playwright__browser_tabs"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[Safety Check] Before executing this Bash command, check for dangerous patterns:\n- rm -rf / or rm -rf ~ or rm -rf (no confirmation)\n- DROP TABLE or DROP DATABASE\n- git push --force to main/master\n- git reset --hard\n- DELETE FROM without WHERE\n- Direct sqlite3 writes to smart_energy.db\nIf matched, STOP and ask user for confirmation. Otherwise proceed."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[Safety Check] Before modifying this file, check if it is sensitive:\n- .env or .env.example (API keys, passwords)\n- smart_energy.db (direct DB modification)\n- .claude/settings.json (Claude Code config)\n- .gitignore (could expose sensitive files)\nIf yes, confirm with user before modifying. Code files (.py, .js, .html, .css, .md): proceed normally."
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "SubagentStart",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[Context Injection] Subagent starting. Inject project context:\n1. Current git branch: run git branch --show-current\n2. NO_PROXY prefix: NO_PROXY=127.0.0.1,localhost for all Python/test commands\n3. Python path: D:/miniconda3/envs/ene/python.exe (not conda run)\n4. Agent-specific:\n   - test-runner: check server availability before tests\n   - doc-writer: read work-summary-rules.md for formatting\n   - mcp-search: prefer context7 over web-search-prime for library docs"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "SubagentStop",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[Completion Check] Subagent finished. Follow up based on agent type:\n- test-runner with failures: suggest fix + re-test\n- test-runner all pass: confirm results noted\n- doc-writer: verify work_summary formatting per work-summary-rules.md\n- mcp-search: review summary relevance\n- Any file modifications: consider /visual-check if SVG/JS/CSS changed"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "Stop",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[Session End] Before ending:\n1. Run git status --short to check uncommitted changes. Auto-commit docs (work_summary, changelog, rules) if uncommitted.\n2. Summarize pending TODOs from latest work_summary.\n3. If not on main branch, remind about daily branch workflow (merge --no-ff to main, delete day branch)."
+          }
+        ]
+      }
+    ]
+  }
+}

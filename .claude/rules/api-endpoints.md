@@ -1,0 +1,83 @@
+# API Endpoints Reference
+
+## Authentication
+- `POST /api/login` - User login
+- `POST /api/logout` - Clear session
+
+## Projects & Devices
+- `GET /api/projects` - List projects (?industry=&company= filters)
+- `POST /api/projects` - Create project
+- `GET /api/projects/<pid>` - Get project details (all fields)
+- `PUT /api/projects/<pid>` - Update project
+- `DELETE /api/projects/<pid>` - Soft delete project (status=0)
+- `GET /api/projects/deleted` - List deleted projects
+- `POST /api/projects/<pid>/restore` - Restore deleted project
+- `POST /api/projects/<pid>/copy` - Copy project with systems and devices
+- `GET /api/projects/<pid>/devices` - Get project devices
+- `POST /api/projects/<pid>/devices` - Add device to project
+- `DELETE /api/devices/<did>` - Soft delete device (status=0)
+
+## Agriculture
+- `GET /api/agriculture/meteorology/<pid>` - Weather data
+- `GET /api/agriculture/soil/<pid>` - Soil moisture data
+
+## Cooling/Heating
+- `GET /api/cooling/overview/<pid>` - System overview
+- `GET /api/cooling/energy/<pid>` - Energy data
+- `GET /api/cooling/systems` - List cooling systems
+- `GET /api/cooling/endpoints` - Get endpoints
+- `GET /api/cooling/faults` - Get faults (client-side pagination)
+- `GET /api/cooling/environment/<pid>` - Environment data (?hours=, ?start_date=, ?end_date=)
+
+## Weather API (QWeather)
+- `GET /api/weather/now` - Current weather
+- `GET /api/weather/24h` - 24-hour forecast
+- `GET /api/weather/7d` - 7-day forecast
+- `GET /api/weather/30d` - 30-day forecast (simulated)
+
+## Device Control
+- `POST /api/device/control/<did>` - Remote control (requires can_control=1)
+- `GET /api/device/logs` - Audit log (?username=, ?page=, ?page_size=; returns `pagination` block)
+
+## Data Management
+- `POST /api/data/export` - Export historical data
+- `POST /api/data/compare` - Compare data across periods
+
+## System Library & Device Library
+- `GET/POST /api/system-library` - List/Create system templates (?industry=)
+- `PUT/DELETE /api/system-library/<sid>` - Update/Soft-delete system template
+- `GET/POST /api/device-library` - List/Create device templates (?industry=&type=)
+- `PUT/DELETE /api/device-library/<did>` - Update/Soft-delete device template
+
+## Schematic Layout (SCADA Configuration Editor)
+- `GET /api/schematic-layout` - List layouts (?project_id=&is_template=&industry=)
+- `POST /api/schematic-layout` - Create layout (project_id, name, industry, layout_data, is_template, template_category)
+- `PUT /api/schematic-layout/<lid>` - Update layout (name, layout_data, is_template, thumbnail)
+- `DELETE /api/schematic-layout/<lid>` - Soft-delete layout
+- `POST /api/schematic-layout/<lid>/duplicate` - Duplicate layout (target_project_id, name)
+- `GET /api/schematic-layout/templates` - List template layouts (?industry=)
+
+## Gas Consumption (Manual Entry / Meter Reading)
+- `GET/POST /api/gas-consumption` - List/Add records (?project_id=&start_date=&end_date=&meter_type=)
+- `PUT/DELETE /api/gas-consumption/<gid>` - Update/Soft-delete record
+- Also available as `/api/meter-readings` (alias)
+
+## Heating/Cooling Season
+- `GET/POST /api/heating-cooling-season` - List/Add (?season_type=&company=)
+- `PUT/DELETE /api/heating-cooling-season/<sid>` - Update/Soft-delete
+
+## TOU Electricity Pricing
+- `GET/POST /api/tou-electricity-prices` - List/Add (?project_id=&company=; includes hourly_schedule JSON)
+- `PUT/DELETE /api/tou-electricity-prices/<pid>` - Update/Soft-delete
+
+## Gas Pricing
+- `GET/POST /api/gas-prices` - List/Add (?project_id=&company=)
+- `PUT/DELETE /api/gas-prices/<gid>` - Update/Soft-delete
+
+## Water Pricing
+- `GET/POST /api/water-prices` - List/Add (?project_id=&company=)
+- `PUT/DELETE /api/water-prices/<wid>` - Update/Soft-delete
+
+## Other
+- `GET /api/regions` - Province/city/district address data
+- `GET/POST /api/system/settings` - Get/Update system settings
