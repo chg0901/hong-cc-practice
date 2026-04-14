@@ -66,11 +66,42 @@
 
 **原则**：不允许静默删除内容。每次删除必须在 ChangeLogs 中记录理由。
 
+## GitHub 同步（mandatory）
+
+`.claude/` 目录配置在两个 repo 中维护：
+
+| Repo | URL | 内容 | 自动/手动 |
+|------|-----|------|----------|
+| Gitee（主项目） | `gitee.com/chg0901/energy` | 部分 `.claude/` 文件（`git add -f` 强制添加） | 随项目提交 |
+| GitHub（配置专用） | `github.com/chg0901/hong-cc-practice` | 完整 `.claude/` 配置（排除敏感文件） | 手动同步 |
+
+### 同步时机
+
+修改 `.claude/` 下的文件后，**必须**执行同步：
+
+```bash
+bash scripts/sync_claude_config.sh --push
+```
+
+### 同步范围
+
+| 包含 | 排除（原因） |
+|------|-------------|
+| `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
+| `rules/*.md`（18 个 rules） | `book2skills/`（第三方安装的 skills） |
+| `skills/*/SKILL.md`（4 个项目 skills） | `create-colleague/`（第三方安装的 skills） |
+| `settings.json`（hooks 配置，无敏感信息） | — |
+
+同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
+本地 clone：`$HOME/.claude-github/hong-cc-practice/`
+
 ## Execution
 
 本规则在每次修改 rules/skills/memory 文件后**手动执行**（不是自动化 hook）。在提交前快速过一遍 checklist 即可。
 
 ## ChangeLogs
 
-- [2026-04-13 21:00:00] 新增 Hooks 配置检查项（mandatory，检查 settings.json hooks 是否需要同步更新）
+- [2026-04-14 10:30:00] 新增 GitHub 同步规则（mandatory）：双 repo 维护、同步时机、同步范围、排除清单
+- [2026-04-14 10:00:00] 新增删除内容检查（mandatory）：理由/原因/影响/交叉更新
+- [2026-04-13 21:00:00] 新增 Hooks 配置检查项（mandatory）
 - [2026-04-09 — Initial: 修改 rules/skills/memory 后的去重+精简+位置检查规则](changes/2026-04-09)
