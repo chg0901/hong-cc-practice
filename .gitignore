@@ -1,0 +1,13 @@
+# Sensitive files - NEVER push these
+settings.local.json
+*.secret
+*.key
+.env
+
+# Third-party installed skills (managed separately)
+book2skills/
+create-colleague/
+
+# OS files
+Thumbs.db
+.DS_Store
