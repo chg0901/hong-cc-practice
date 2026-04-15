@@ -124,12 +124,14 @@ When adding test files:
 
 1. **更新 `docs/work_summary_YYYYMMDD.md`**：确保所有已完成的任务有编号章节、涉及文件表、小结
 2. **更新 ChangeLogs**：在工作日志和 CLAUDE.md 中添加新条目
-3. **Git commit**：`git add` 所有变更文件 + `git commit`
+3. **Git commit**：`git add` 所有变更文件（`.claude/` 文件需 `git add -f`）+ `git commit`
 4. **Git push**：`NO_PROXY=gitee.com git push origin main`
-5. **报告状态**：告知用户提交完成（commit hash + 文件数）
+5. **GitHub 同步**：`bash scripts/sync_claude_config.sh --push`（仅当修改了 `.claude/` 文件时）
+6. **报告状态**：告知用户提交完成（commit hash + 文件数 + 是否同步 GitHub）
 
 **Why**: 防止上下文压缩或会话中断导致未提交的工作丢失。每个任务批次是一个逻辑完整性边界。
 **How to apply**: 不需要等用户说"提交"或"commit"，完成任务批次后立即执行。
+**When to sync GitHub**: 仅当修改了 `.claude/rules/`、`.claude/agents/`、`.claude/skills/`（自建 5 个）、`.claude/settings.json` 时才需要步骤 5。
 
 ## ChangeLogs
 

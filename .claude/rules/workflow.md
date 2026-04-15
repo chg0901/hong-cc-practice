@@ -36,27 +36,55 @@ See [proxy-rules.md](proxy-rules.md) for all NO_PROXY patterns and environment v
 
 **Why**: Keeps main clean, isolates daily work for easy review/rollback, makes commit history legible by date.
 
-Use a **new git branch per day** as the default development pattern:
+**触发条件**：每次新会话开始时（用户发出第一条指令前），检查当前分支。
 
-```bash
-# Session start — create today's branch
-git checkout main
-git pull origin main
-git checkout -b 2026-04-04          # use today's date
+### Session Start 检查
 
-# Session end — merge back and clean up
-git checkout main
-git merge --no-ff 2026-04-04 -m "feat/fix/docs: summary of today's work"
-git push origin main
-git branch -d 2026-04-04
+```
+IF 当前分支 == main:
+    git checkout main
+    NO_PROXY=gitee.com git pull origin main
+    git checkout -b YYYY-MM-DD            # 用今天的日期
+    REPORT: "Created daily branch YYYY-MM-DD"
+ELSE IF 当前分支 != 今天的日期分支:
+    WARN: "当前在旧分支 {branch}，建议 merge 回 main 后创建今天的分支"
+ELSE:
+    REPORT: "Daily branch {branch} active"
 ```
 
-**Branch naming**: `YYYY-MM-DD` or `YYYY-MM-DD-<topic>` for multi-day features
+### Session End 流程
 
-**Rules**:
+```bash
+# 1. 确保所有工作已提交
+git add -f .claude/rules/*.md .claude/agents/*.md .claude/settings.json  # .claude/ 在 .gitignore 中
+git add docs/ scripts/ 其他变更文件
+git commit -m "描述本次变更"
+
+# 2. 合并回 main
+git checkout main
+git merge --no-ff YYYY-MM-DD -m "feat/fix/docs: 今日工作摘要"
+
+# 3. 推送
+NO_PROXY=gitee.com git push origin main
+
+# 4. 同步 .claude/ 到 GitHub
+bash scripts/sync_claude_config.sh --push
+
+# 5. 清理
+git branch -d YYYY-MM-DD
+```
+
+### Branch naming
+
+- `YYYY-MM-DD`：默认每日分支
+- `YYYY-MM-DD-<topic>`：多天特性分支
+
+### Rules
+
 - At every new session, check current branch — if on main, create today's branch immediately
 - Do NOT accumulate multiple days on one branch
 - Merge commit message summarizes all tasks done that day
+- **如果会话中已经在 main 上做了提交**（如本会话），跳过分支创建，直接在 main 上继续工作，session end 时直接 push
 - After merge, always delete the day branch locally
 
 ## Function/Code Deletion Rules

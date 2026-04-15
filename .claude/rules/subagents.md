@@ -62,6 +62,13 @@ book2skills, create-colleague, context-research
 | SubagentStop | 子代理完成 | L4 Subagents | 触发后续动作（测试失败修复、文档验证） |
 | SessionEnd | 对话结束 | L5 Teams + L2 Rules | 自动提交文档、汇总 TODO、提醒分支合并 |
 
+### Prompt Hook 注意事项
+
+- **Prompt hooks 不能加 JSON 约束**：`type: "prompt"` 的 hooks 由框架内部解析 LLM 输出，末尾不能加 `"Respond with JSON only."`，否则触发 JSON validation failed
+- **Prompt 以自然语言结尾**：推荐用 `Otherwise proceed.` 结尾，让 LLM 自然响应
+- **需要确定性输出时用 command hooks**：`type: "command"` + shell 脚本 + exit code（0=放行，2=阻塞）
+- **详细记录**：见 `memory/feedback_prompt_hooks_no_json.md`
+
 ## Subagent 使用规则
 
 ### 本项目自定义 Subagents
@@ -174,6 +181,7 @@ See [teams.md](../agents/teams.md) for 3 pre-defined team templates:
 
 ## ChangeLogs
 
+- [2026-04-15 14:00:00] 新增 Prompt Hook 注意事项（不能加 JSON 约束、自然语言结尾、需要确定性时用 command hooks）
 - [2026-04-15 10:30:00] 新增 Skills 全景图（14 个 skills 分类表）、Skill 触发控制参考、更新 L3 技能计数（5→14）
 - [2026-04-15 09:00:00] 修复 Stop → SessionEnd：Stop 事件名已废弃（触发频率异常），改为 SessionEnd；生命周期事件 matcher 改为空字符串 ""
 - [2026-04-14 09:30:00] 新增 Agent Frontmatter 参考、Command→Agent→Skill 模式、五种多 Agent 协调模式
