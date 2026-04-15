@@ -118,6 +118,20 @@ When adding test files:
 2. Work summary: Add test results table with pass/fail counts
 3. Link test files: `[test_xxx.py](../test_codes/test_xxx.py)`
 
+## Task-Batch Commit Checkpoint（任务批次提交检查点）
+
+**规则**：每完成一个任务批次、准备等待用户下一步指令时，**必须自动执行**以下流程：
+
+1. **更新 `docs/work_summary_YYYYMMDD.md`**：确保所有已完成的任务有编号章节、涉及文件表、小结
+2. **更新 ChangeLogs**：在工作日志和 CLAUDE.md 中添加新条目
+3. **Git commit**：`git add` 所有变更文件 + `git commit`
+4. **Git push**：`NO_PROXY=gitee.com git push origin main`
+5. **报告状态**：告知用户提交完成（commit hash + 文件数）
+
+**Why**: 防止上下文压缩或会话中断导致未提交的工作丢失。每个任务批次是一个逻辑完整性边界。
+**How to apply**: 不需要等用户说"提交"或"commit"，完成任务批次后立即执行。
+
 ## ChangeLogs
 
+- [2026-04-15 11:00:00] 新增 Task-Batch Commit Checkpoint 规则
 - [2026-04-13 20:56:00] Initial: merged from changelog.md + doc-structure.md

@@ -52,8 +52,8 @@ ZAI analyze_data_viz      → Chart/graph data correctness
 ### Web Search & Documentation
 
 ```
-MiniMax web_search        → General web search
-web-search-prime          → Alternative web search
+MiniMax web_search        → General web search (query param, not search_query)
+web-search-prime          → Zhipu web search (search_query param)
 web-reader webReader      → URL to markdown conversion
 context7 query-docs       → Library/framework documentation
 zread read_file           → GitHub repo file reader
@@ -97,6 +97,23 @@ For NO_PROXY patterns and environment variables, see [proxy-rules.md](proxy-rule
 | Supabase | OAuth | Browser redirect (one-time) via `authenticate` tool |
 | MiniMax | API Key | `.claude.json` → mcpServers → MiniMax → env |
 | ZAI | API Key | `.claude.json` → mcpServers → zai-mcp-server → env |
+
+## MiniMax Coding Plan MCP
+
+Package: `minimax-coding-plan-mcp` (GitHub: [MiniMax-AI/MiniMax-Coding-Plan-MCP](https://github.com/MiniMax-AI/MiniMax-Coding-Plan-MCP))
+
+| Tool | Param | Description |
+|------|-------|-------------|
+| `understand_image` | `image_source` + `prompt` | General image analysis (local file or URL) |
+| `web_search` | `query` | Web search returning organic results |
+
+API Host: `https://api.minimaxi.com` (China) / `https://api.minimax.io` (international). Key and host **must match region**.
+
+Docs: [platform.minimaxi.com/docs/guides/mcp-guide](https://platform.minimaxi.com/docs/guides/mcp-guide)
+
+## ZAI MCP (GLM-4V Vision)
+
+Package: `@z_ai/mcp-server` (NPM). Env: `Z_AI_API_KEY`, `Z_AI_MODE=ZHIPU`. Tools: 8 specialized vision tools (see Vision Tool Selection table above).
 | zhipu APIs | Bearer token | `.claude.json` → mcpServers → web-search-prime/reader/zread → headers |
 
 ## Cache Locations (D Drive)
@@ -171,6 +188,7 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 
 ## ChangeLogs
 
+- [2026-04-14 16:00:00] Added MiniMax Coding Plan MCP section (package, API host, tools, docs URL); clarified MiniMax vs ZAI separation; added `query` vs `search_query` param distinction
 - [2026-04-13 20:56:00] Deduplicated: NO_PROXY section replaced with pointer to proxy-rules.md, cache section updated with cross-references
 - [2026-04-13 — Added Zhipu MCP usage rules](changes/2026-04-13-zhipu)
 - [2026-04-09 — Initial: 24 MCP servers catalog, usage guidelines, auth reference](changes/2026-04-09)

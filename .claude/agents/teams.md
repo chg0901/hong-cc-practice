@@ -53,4 +53,4 @@ Agent Teams (L5) coordinate with other layers via Hooks (L1):
 | SubagentStop | Agent completion | Validate output, trigger follow-up actions |
 | PreToolUse | Before Bash/Edit | Safety check on all agents' operations |
 | PostToolUse | After Edit/Write | Auto-trigger /visual-check for UI changes |
-| Stop | Session end | Consolidate all agents' results, auto-commit docs |
+| SessionEnd | Session end | Consolidate all agents' results, auto-commit docs |

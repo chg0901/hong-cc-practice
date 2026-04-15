@@ -32,7 +32,7 @@
     ],
     "SubagentStart": [
       {
-        "matcher": "SubagentStart",
+        "matcher": "",
         "hooks": [
           {
             "type": "prompt",
@@ -43,7 +43,7 @@
     ],
     "SubagentStop": [
       {
-        "matcher": "SubagentStop",
+        "matcher": "",
         "hooks": [
           {
             "type": "prompt",
@@ -52,9 +52,9 @@
         ]
       }
     ],
-    "Stop": [
+    "SessionEnd": [
       {
-        "matcher": "Stop",
+        "matcher": "",
         "hooks": [
           {
             "type": "prompt",

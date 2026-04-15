@@ -37,6 +37,10 @@ For `web-search-prime`:
 - `search_recency_filter`: `oneMonth` for recent info
 - `content_size`: `high` for detailed summary
 
+For `MiniMax web_search`:
+- `query`: search text (no length limit documented)
+- Note: MiniMax `web_search` uses `query` param, NOT `search_query`
+
 ### Step 3: Read full page
 
 For `webReader`:
