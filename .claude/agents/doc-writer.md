@@ -30,6 +30,10 @@ Read `.claude/rules/work-summary-rules.md` for the authoritative reference on:
 - Hyperlink rules
 - Insight recording rules
 
+For `docs/zhihu_*.md` files, read `.claude/rules/zhihu-article.md` for:
+- Two-level heading constraint (# and ## only)
+- Zhihu-specific formatting (no ---, <img> width control)
+
 ## Which Docs to Update
 
 At minimum:

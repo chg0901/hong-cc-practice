@@ -96,8 +96,9 @@ book2skills, create-colleague, context-research
 
 ### 第三方 Skills（symlink，npx 管理，不同步到 GitHub）
 
-book-study, code-review-expert, sigma, skill-forge, wiki-ingest
+book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph
 
 ## ChangeLogs
 
+- [2026-04-15 14:30:00] 新增 fireworks-tech-graph 到第三方 symlink skills（7个）
 - [2026-04-15 10:30:00] Initial: 安装新 skills/agents 后的 6 步整理流程、冲突检查、同步范围

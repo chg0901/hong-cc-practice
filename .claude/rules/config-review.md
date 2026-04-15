@@ -88,7 +88,7 @@ bash scripts/sync_claude_config.sh --push
 | 包含 | 排除（原因） |
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
-| `rules/*.md`（22 个 rules） | `book2skills/`（第三方安装的 skills） |
+| `rules/*.md`（23 个 rules） | `book2skills/`（第三方安装的 skills） |
 | `skills/*/SKILL.md`（5 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
@@ -104,6 +104,7 @@ bash scripts/sync_claude_config.sh --push
 ## ChangeLogs
 
 - [2026-04-15 10:30:00] 更新同步范围：skills 7→7 自建（排除 5 个第三方 symlink），rules 18→19，新增 `.agents/skills/*` 排除
+- [2026-04-15 14:30:00] Rules 计数 22→23（新增 zhihu-article.md）
 - [2026-04-14 10:30:00] 新增 GitHub 同步规则（mandatory）：双 repo 维护、同步时机、同步范围、排除清单
 - [2026-04-14 10:00:00] 新增删除内容检查（mandatory）：理由/原因/影响/交叉更新
 - [2026-04-13 21:00:00] 新增 Hooks 配置检查项（mandatory）
