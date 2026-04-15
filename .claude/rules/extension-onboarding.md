@@ -88,15 +88,15 @@ bash scripts/sync_claude_config.sh --push
 
 ### 项目自建 Skills（`.claude/skills/`，纳入 Git 同步）
 
-visual-check, interaction-check, graphify-workflow, context-research, manual-review, long-screenshot, create-colleague
+graphify-workflow, interaction-check, visual-check, manual-review, long-screenshot
 
-### 第三方 Skills（symlink 到 `.agents/skills/`，不纳入 Git 同步）
+### 第三方 Skills（git clone/npm 安装，不同步到 GitHub）
 
-code-review-expert, sigma, skill-forge, book-study, wiki-ingest
+book2skills, create-colleague, context-research
 
-### 第三方 Skills（已有，不纳入 Git 同步）
+### 第三方 Skills（symlink，npx 管理，不同步到 GitHub）
 
-book2skills
+book-study, code-review-expert, sigma, skill-forge, wiki-ingest
 
 ## ChangeLogs
 

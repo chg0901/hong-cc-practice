@@ -89,7 +89,8 @@ bash scripts/sync_claude_config.sh --push
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
 | `rules/*.md`（22 个 rules） | `book2skills/`（第三方安装的 skills） |
-| `skills/*/SKILL.md`（7 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
+| `skills/*/SKILL.md`（5 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
+| — | `context-research/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
 | — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`（第三方 symlink） |
 
