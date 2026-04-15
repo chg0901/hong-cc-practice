@@ -124,6 +124,13 @@ RULE check_mermaid_visual(png_path):
 
 ## 渲染命令
 
+**重要：编辑 .mmd 文件后，必须完成以下 4 步验证流程（不可跳过）：**
+
+1. **渲染 PNG**：`PUPPETEER_EXECUTABLE_PATH="D:/claude_code_mcp/puppeteer-chrome/chrome-win64/chrome.exe" mmdc -i input.mmd -o output.png -t neutral -s 2`
+2. **检查长宽比**：`python -c "from PIL import Image; img=Image.open('output.png'); r=img.size[0]/img.size[1]; print(f'{r:.2f}', 'OK' if 0.33<=r<=3.0 else 'FAIL')"` — 不在 0.33-3.0 范围则必须修复
+3. **Vision MCP 检查**：`MiniMax understand_image` 检查所有节点的文字清晰度、重叠、溢出
+4. **更新文档引用**：使用 `<img src="..." width="N"/>` 控制窄长图显示宽度
+
 ```bash
 # 横向 16:9 / Landscape 16:9
 mmdc -i input.mmd -o output.png -t neutral -w 1600 -H 900 -s 2
@@ -227,6 +234,7 @@ mermaid/
 
 ## ChangeLogs
 
+- 2026-04-15 — 新增渲染后 4 步强制验证流程、窄长图 `<img width>` 显示控制
 - 2026-04-13 — 新增：sequence 图颜色（themeVariables）、`<br/>` 换行规则、不适合 mermaid 的场景直接用表格（dagre 间距 overhead）
 - 2026-04-10 — 新增减少连线交叉技巧（节点定义顺序、跨区域连线优化、连线顺序对齐）、sqlite_foreign_keys 布局优化、system-flow 颜色修复
 - 2026-04-10 — 新增：classDef 颜色必须（禁止黑白图）、拆分并列展示、对比文档规则（相对路径 `../`、HTML table、旧版从 git 恢复）
