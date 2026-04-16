@@ -27,6 +27,7 @@ Read `.claude/rules/work-summary-rules.md` for the authoritative reference on:
 - Document-level structure (Insights -> tasks -> TODOs -> Changelog)
 - Task section format (现状/解决方案/实施内容/技术要点/涉及文件/小结)
 - CLAUDE.md changelog entry format with timestamps
+- **Timestamp rule**: MUST use `date '+%H:%M:%S'` to get actual host time before writing any timestamp. NEVER fabricate or estimate timestamps.
 - Hyperlink rules
 - Insight recording rules
 

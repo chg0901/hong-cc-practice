@@ -68,6 +68,8 @@ File paths MUST use markdown hyperlinks `[filename](relative/path)`. Mermaid fig
 - Reverse chronological order (newest first)
 - Same-day: `### YYYY-MM-DD -- 主题描述` (NO numeric suffixes)
 - **每个条目必须包含时间戳** `[HH:MM:SS]`
+- **时间戳必须使用实际主机时间**：在写日志前用 `date '+%H:%M:%S'` 获取当前时间，不得编造或估算时间
+- **同一天跨多个时段时**：每完成一个任务批次获取一次时间，确保时间线真实可追溯
 - Link to relevant files using markdown `[name](path)` format
 
 ## Insight Recording Rule
@@ -123,17 +125,20 @@ When adding test files:
 **规则**：每完成一个任务批次、准备等待用户下一步指令时，**必须自动执行**以下流程：
 
 1. **更新 `docs/work_summary_YYYYMMDD.md`**：确保所有已完成的任务有编号章节、涉及文件表、小结
-2. **更新 ChangeLogs**：在工作日志和 CLAUDE.md 中添加新条目
-3. **Git commit**：`git add` 所有变更文件（`.claude/` 文件需 `git add -f`）+ `git commit`
-4. **Git push**：`NO_PROXY=gitee.com git push origin main`
-5. **GitHub 同步**：`bash scripts/sync_claude_config.sh --push`（仅当修改了 `.claude/` 文件时）
-6. **报告状态**：告知用户提交完成（commit hash + 文件数 + 是否同步 GitHub）
+2. **更新 ChangeLogs**：在工作日志和 CLAUDE.md 中添加新条目，**时间戳必须用 `date '+%H:%M:%S'` 获取实际主机时间**
+3. **文档一致性检查**：对比 work_summary / CLAUDE.md / changelog.md 三处 ChangeLogs，确保无遗漏无矛盾
+4. **Git commit**：`git add` 所有变更文件（`.claude/` 文件需 `git add -f`）+ `git commit`
+5. **Git push Gitee**：`NO_PROXY=gitee.com git push origin main`
+6. **GitHub 同步**：`bash scripts/sync_claude_config.sh --push`（仅当修改了 `.claude/` 文件时）
+7. **报告状态**：告知用户提交完成（commit hash + 文件数 + 是否同步 GitHub）
 
 **Why**: 防止上下文压缩或会话中断导致未提交的工作丢失。每个任务批次是一个逻辑完整性边界。
 **How to apply**: 不需要等用户说"提交"或"commit"，完成任务批次后立即执行。
-**When to sync GitHub**: 仅当修改了 `.claude/rules/`、`.claude/agents/`、`.claude/skills/`（自建 5 个）、`.claude/settings.json` 时才需要步骤 5。
+**When to sync GitHub**: 仅当修改了 `.claude/rules/`、`.claude/agents/`、`.claude/skills/`（自建 5 个）、`.claude/settings.json` 时才需要步骤 6。
+**双仓库同步**：Gitee（主项目代码 + .claude/）和 GitHub（.claude/ 配置专用）必须保持一致。每次 commit 后先 push Gitee，再按需 sync GitHub。
 
 ## ChangeLogs
 
 - [2026-04-15 11:00:00] 新增 Task-Batch Commit Checkpoint 规则
-- [2026-04-13 20:56:00] Initial: merged from changelog.md + doc-structure.md
+- [2026-04-16 09:38:00] 新增时间戳必须使用实际主机时间规则（不得编造/估算）
+- [2026-04-16 09:49:00] Commit Checkpoint 新增步骤 3（文档一致性检查）+ 明确双仓库同步要求
