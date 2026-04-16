@@ -83,3 +83,13 @@ Next session → Scan for remaining `- [ ]`, carry forward to new summary
 - Group by category (文档/UI测试/功能增强/自动测试)
 - For UI test items, use the `#### UI-N. 标题` format with checkbox sub-items
 - Include "前置操作" instructions before manual test sections
+
+## Cross-Session Enforcement
+
+- 每次新会话开始时，必须先执行 [daily-review.md](daily-review.md) 中的待办审查流程
+- 会话结束时的待办汇总中，用 `**[下次优先]**` 标记下次应优先处理的项
+- 与 [daily-review.md](daily-review.md) 互补：本文件管格式规范，daily-review 管跨会话执行
+
+## ChangeLogs
+
+- [2026-04-16 10:00:00] 新增 Cross-Session Enforcement 章节，关联 daily-review.md

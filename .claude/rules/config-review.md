@@ -92,7 +92,7 @@ bash scripts/sync_claude_config.sh --push
 | `skills/*/SKILL.md`（5 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
-| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`（第三方 symlink） |
+| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`（第三方 symlink） |
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -104,6 +104,7 @@ bash scripts/sync_claude_config.sh --push
 ## ChangeLogs
 
 - [2026-04-15 10:30:00] 更新同步范围：skills 7→7 自建（排除 5 个第三方 symlink），rules 18→19，新增 `.agents/skills/*` 排除
+- [2026-04-15 15:00:00] 新增 fireworks-tech-graph 到排除清单（第三方 symlink，6 个）
 - [2026-04-15 14:30:00] Rules 计数 22→23（新增 zhihu-article.md）
 - [2026-04-14 10:30:00] 新增 GitHub 同步规则（mandatory）：双 repo 维护、同步时机、同步范围、排除清单
 - [2026-04-14 10:00:00] 新增删除内容检查（mandatory）：理由/原因/影响/交叉更新

@@ -15,8 +15,8 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "[Safety Check] Before executing this Bash command, check for dangerous patterns:\n- rm -rf / or rm -rf ~ or rm -rf (no confirmation)\n- DROP TABLE or DROP DATABASE\n- git push --force to main/master\n- git reset --hard\n- DELETE FROM without WHERE\n- Direct sqlite3 writes to smart_energy.db\nIf matched, STOP and ask user for confirmation. Otherwise proceed."
+            "type": "command",
+            "command": "bash d:/Proj/energy/scripts/hooks/pre_bash_safety.sh"
           }
         ]
       },
@@ -24,8 +24,8 @@
         "matcher": "Edit|Write",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "[Safety Check] Before modifying this file, check if it is sensitive:\n- .env or .env.example (API keys, passwords)\n- smart_energy.db (direct DB modification)\n- .claude/settings.json (Claude Code config)\n- .gitignore (could expose sensitive files)\nIf yes, confirm with user before modifying. Code files (.py, .js, .html, .css, .md): proceed normally."
+            "type": "command",
+            "command": "bash d:/Proj/energy/scripts/hooks/pre_edit_safety.sh"
           }
         ]
       }

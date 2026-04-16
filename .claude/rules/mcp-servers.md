@@ -1,8 +1,8 @@
 # MCP Server Usage Rules
 
-## Available MCP Servers (24 total)
+## Available MCP Servers (25 total)
 
-### Custom Servers (.claude.json) — 6 servers
+### Custom Servers (.claude.json) — 7 servers
 
 | Server | Type | Status | Primary Use |
 |--------|------|--------|-------------|
@@ -12,6 +12,7 @@
 | web-search-prime | HTTP (zhipu) | connected | Web search |
 | web-reader | HTTP (zhipu) | connected | URL to markdown |
 | zread | HTTP (zhipu) | connected | GitHub repo browser |
+| jina-mcp-server | HTTP (remote) | connected | Web read/search, arXiv, PDF, rerank, dedup (20 tools) |
 
 ### Plugin Servers (settings.json) — 8 servers
 
@@ -57,7 +58,47 @@ web-search-prime          → Zhipu web search (search_query param)
 web-reader webReader      → URL to markdown conversion
 context7 query-docs       → Library/framework documentation
 zread read_file           → GitHub repo file reader
+jina read_url             → URL to markdown (Puppeteer rendered, better for SPA/PDF)
+jina search_web           → Web search with full content (not just snippets)
+jina search_arxiv         → Academic paper search
+jina search_ssrn          → Social science paper search
+jina search_images        → Image search
+jina extract_pdf          → PDF figure/table/equation extraction
 ```
+
+### Jina MCP Tool Usage Priority
+
+**日常开发（默认使用）**：
+- `read_url` — 读取网页/PDF 内容为 Markdown
+- `search_web` — 网络搜索（返回完整内容而非摘要）
+- `search_arxiv` — 学术论文搜索
+- `primer` — 获取当前时间/本地化信息
+- `guess_datetime_url` — 判断页面发布时间
+
+**并行操作（多查询场景）**：
+- `parallel_read_url` — 同时读取多个 URL
+- `parallel_search_web` — 同时执行多个搜索
+- `parallel_search_arxiv` / `parallel_search_ssrn` — 并行学术搜索
+
+**Rerank 工具（按需使用，仅用户明确要求时调用）**：
+- `sort_by_relevance` — 搜索结果按相关性重排
+- `deduplicate_strings` — 语义去重
+- `deduplicate_images` — 图片语义去重
+- `classify_text` — 文本分类
+
+> Rerank 工具消耗 Jina token 且用频较低。仅在用户要求深度研究、竞品分析、论文综述等场景下主动使用。
+
+### Jina vs 现有搜索工具选择
+
+| 场景 | 首选工具 | 原因 |
+|------|---------|------|
+| 库/框架文档 | `context7` | 最精确，无配额消耗 |
+| 中文网页搜索 | `web-search-prime` | 中文搜索优化 |
+| 英文技术内容 | `jina search_web` | 返回完整内容 |
+| 学术论文 | `jina search_arxiv` | 唯一支持学术搜索 |
+| PDF 读取 | `jina read_url` | 原生 PDF 支持 |
+| GitHub 仓库 | `zread` 或 `jina read_url` | zread 更轻量 |
+| SPA/JS 渲染页面 | `jina read_url` | Puppeteer 渲染，对 SPA 支持好 |
 
 ### Browser Automation
 
@@ -97,6 +138,7 @@ For NO_PROXY patterns and environment variables, see [proxy-rules.md](proxy-rule
 | Supabase | OAuth | Browser redirect (one-time) via `authenticate` tool |
 | MiniMax | API Key | `.claude.json` → mcpServers → MiniMax → env |
 | ZAI | API Key | `.claude.json` → mcpServers → zai-mcp-server → env |
+| Jina | API Key (optional) | `.claude.json` → mcpServers → jina-mcp-server → headers |
 
 ## MiniMax Coding Plan MCP
 
@@ -188,6 +230,7 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 
 ## ChangeLogs
 
+- [2026-04-15 16:20:00] Added jina-mcp-server (remote HTTP, 20 tools); updated custom servers 6→7; added Jina tool usage priority + rerank strategy + collaboration flow; MCP total 24→25
 - [2026-04-14 16:00:00] Added MiniMax Coding Plan MCP section (package, API host, tools, docs URL); clarified MiniMax vs ZAI separation; added `query` vs `search_query` param distinction
 - [2026-04-13 20:56:00] Deduplicated: NO_PROXY section replaced with pointer to proxy-rules.md, cache section updated with cross-references
 - [2026-04-13 — Added Zhipu MCP usage rules](changes/2026-04-13-zhipu)
