@@ -97,7 +97,7 @@ book2skills, create-colleague, context-research
 
 ### 第三方 Skills（symlink，npx 管理，不同步到 GitHub）
 
-book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph, web-access
+book-study, code-review-expert, sigma, skill-forge, wiki-ingest, web-access
 
 ## ChangeLogs
 
