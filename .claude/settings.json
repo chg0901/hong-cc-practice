@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "[Context Injection] Subagent starting. Inject project context:\n1. Current git branch: run git branch --show-current\n2. NO_PROXY prefix: NO_PROXY=127.0.0.1,localhost for all Python/test commands\n3. Python path: D:/miniconda3/envs/ene/python.exe (not conda run)\n4. Agent-specific:\n   - test-runner: check server availability before tests\n   - doc-writer: read work-summary-rules.md for formatting\n   - mcp-search: prefer context7 over web-search-prime for library docs"
+            "prompt": "[Context Injection] Subagent starting. Inject project context:\n1. Current git branch: run git branch --show-current\n2. NO_PROXY prefix: NO_PROXY=127.0.0.1,localhost for all Python/test commands\n3. Python path: D:/miniconda3/envs/ene/python.exe (not conda run)\n4. Agent-specific:\n   - test-runner: check server availability before tests\n   - doc-writer: read work-summary-rules.md for formatting\n   - mcp-search: follow search-workflow.md for tool Tier selection, parallel search, cross-validation, and standard report format"
           }
         ]
       }

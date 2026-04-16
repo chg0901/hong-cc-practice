@@ -1,6 +1,6 @@
 # MCP Server Usage Rules
 
-## Available MCP Servers (25 total)
+## Available MCP Servers (26 total)
 
 ### Custom Servers (.claude.json) — 7 servers
 
@@ -13,6 +13,12 @@
 | web-reader | HTTP (zhipu) | connected | URL to markdown |
 | zread | HTTP (zhipu) | connected | GitHub repo browser |
 | jina-mcp-server | HTTP (remote) | connected | Web read/search, arXiv, PDF, rerank, dedup (20 tools) |
+
+### Skill-based Servers — 1 server
+
+| Server | Type | Status | Primary Use |
+|--------|------|--------|-------------|
+| web-access (eze-is) | CDP Proxy | connected | Real Chrome automation, login state, anti-scraping, parallel sub-agents |
 
 ### Plugin Servers (settings.json) — 8 servers
 
@@ -99,6 +105,28 @@ jina extract_pdf          → PDF figure/table/equation extraction
 | PDF 读取 | `jina read_url` | 原生 PDF 支持 |
 | GitHub 仓库 | `zread` 或 `jina read_url` | zread 更轻量 |
 | SPA/JS 渲染页面 | `jina read_url` | Puppeteer 渲染，对 SPA 支持好 |
+| 需登录页面 | `web-access` | 继承 Chrome 登录状态 |
+| 反爬虫站点 | `web-access` | CDP 更难被检测 |
+| 并行浏览多页面 | `web-access` sub-agents | 子代理各自开 tab |
+
+**完整搜索工作流规范**: [search-workflow.md](search-workflow.md)（工具分级、并行策略、交叉验证、报告模板、失败回退链）
+
+### web-access (eze-is)
+
+Skill-based real browser automation via Chrome CDP Proxy.
+
+**安装**: `npx skills add eze-is/web-access`（已安装）
+**前置条件**: Chrome 启用 `chrome://inspect/#remote-debugging` → "Allow remote debugging"
+**API**: HTTP localhost:3456（`/new`, `/eval`, `/click`, `/screenshot`, `/scroll`, `/navigate`, `/close`）
+
+**核心能力**:
+- 继承用户 Chrome 的登录状态（cookies、sessions）
+- 可点击、滚动、填写表单、上传文件
+- 支持反爬虫站点（小红书、微信公众号、知乎等）
+- 支持并行子代理（每个子代理独立 tab）
+- 支持视频分析（seek + 截帧）
+
+**适用场景**: 需登录页面、反爬虫站点、复杂 JS 交互、并行浏览。简单 URL 读取优先使用 `jina read_url` 或 `web-reader`。
 
 ### Browser Automation
 
@@ -227,9 +255,13 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 | Latest news | `web-search-prime` + `recency_filter` | — | Time-bounded results |
 | Specific URL content | `webReader` | Playwright navigate | webReader is lighter |
 | GitHub repo exploration | `zread` | GitHub MCP plugin | zread needs no PAT |
+| Login-required page | `web-access` | Playwright | web-access uses real Chrome login |
+| Anti-scraping site | `web-access` | — | CDP harder to detect |
+| Parallel browsing | `web-access` sub-agents | `jina parallel_read_url` | web-access spawns sub-agents |
 
 ## ChangeLogs
 
+- [2026-04-16 16:30:00] Added web-access (eze-is) skill-based server; updated total 25→26; added web-access section + search tool selection rows; added search-workflow.md pointer
 - [2026-04-15 16:20:00] Added jina-mcp-server (remote HTTP, 20 tools); updated custom servers 6→7; added Jina tool usage priority + rerank strategy + collaboration flow; MCP total 24→25
 - [2026-04-14 16:00:00] Added MiniMax Coding Plan MCP section (package, API host, tools, docs URL); clarified MiniMax vs ZAI separation; added `query` vs `search_query` param distinction
 - [2026-04-13 20:56:00] Deduplicated: NO_PROXY section replaced with pointer to proxy-rules.md, cache section updated with cross-references

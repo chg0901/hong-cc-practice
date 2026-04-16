@@ -28,6 +28,7 @@
 | `.claude/rules/subagents.md` | L3 Skills 计数、Skills 全景图表、触发方式 |
 | `.claude/rules/config-review.md` | GitHub 同步范围（包含/排除清单）、skills 计数 |
 | `.claude/rules/mcp-servers.md` | 如涉及新 MCP server，更新可用服务器列表 |
+| `.claude/rules/search-workflow.md` | 如涉及搜索工具变更，更新工具目录和回退链 |
 | `CLAUDE.md` | 如涉及新开发命令或测试流程，更新对应章节 |
 
 ### Step 3: 更新 Memory
@@ -96,9 +97,10 @@ book2skills, create-colleague, context-research
 
 ### 第三方 Skills（symlink，npx 管理，不同步到 GitHub）
 
-book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph
+book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph, web-access
 
 ## ChangeLogs
 
+- [2026-04-16 16:35:00] 新增 web-access 到第三方 symlink skills（7个）；新增 search-workflow.md 到 Step 2 更新清单
 - [2026-04-15 14:30:00] 新增 fireworks-tech-graph 到第三方 symlink skills（7个）
 - [2026-04-15 10:30:00] Initial: 安装新 skills/agents 后的 6 步整理流程、冲突检查、同步范围

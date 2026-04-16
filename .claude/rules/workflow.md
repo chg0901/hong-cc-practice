@@ -64,13 +64,16 @@ git commit -m "描述本次变更"
 git checkout main
 git merge --no-ff YYYY-MM-DD -m "feat/fix/docs: 今日工作摘要"
 
-# 3. 推送
+# 3. 推送到 Gitee（主仓库）
 NO_PROXY=gitee.com git push origin main
 
-# 4. 同步 .claude/ 到 GitHub
+# 4. 同步代码到 GitHub 镜像
+bash scripts/sync_github.sh
+
+# 5. 同步 .claude/ 配置到 GitHub hong-cc-practice（仅修改了 .claude/ 时）
 bash scripts/sync_claude_config.sh --push
 
-# 5. 清理
+# 6. 清理
 git branch -d YYYY-MM-DD
 ```
 

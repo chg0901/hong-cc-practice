@@ -68,31 +68,45 @@
 
 ## GitHub 同步（mandatory）
 
-`.claude/` 目录配置在两个 repo 中维护：
+`.claude/` 目录配置和项目代码在三个 repo 中维护：
 
-| Repo | URL | 内容 | 自动/手动 |
-|------|-----|------|----------|
-| Gitee（主项目） | `gitee.com/chg0901/energy` | 部分 `.claude/` 文件（`git add -f` 强制添加） | 随项目提交 |
-| GitHub（配置专用） | `github.com/chg0901/hong-cc-practice` | 完整 `.claude/` 配置（排除敏感文件） | 手动同步 |
+| Repo | URL | 角色 | 内容 | 同步方式 |
+|------|-----|------|------|----------|
+| Gitee（主仓库） | `gitee.com/chg0901/energy` | 主仓库 | 完整项目代码 + 部分 `.claude/` | `git push origin main` |
+| GitHub（代码镜像） | `github.com/chg0901/energy` | 只读镜像 | 完整项目代码（与 Gitee 一致） | `bash scripts/sync_github.sh` |
+| GitHub（配置专用） | `github.com/chg0901/hong-cc-practice` | 配置备份 | 完整 `.claude/` 配置（排除敏感文件） | `bash scripts/sync_claude_config.sh --push` |
 
 ### 同步时机
 
-修改 `.claude/` 下的文件后，**必须**执行同步：
+每次任务批次完成后（Commit Checkpoint），按需执行：
 
 ```bash
+# 1. 代码变更 → 同步到 GitHub 镜像
+bash scripts/sync_github.sh
+
+# 2. .claude/ 变更 → 同步到 GitHub 配置专用仓库
 bash scripts/sync_claude_config.sh --push
 ```
+
+### 代理注意
+
+| 操作 | 代理要求 | 命令前缀 |
+|------|----------|----------|
+| 推 Gitee | 必须绕过 | `NO_PROXY=gitee.com` |
+| 推 GitHub | 必须清空 | `git -c http.proxy= -c https.proxy=` |
+
+详见 [proxy-rules.md](proxy-rules.md) 和 [research_gitee_github_sync.md](../../docs/research_gitee_github_sync.md)
 
 ### 同步范围
 
 | 包含 | 排除（原因） |
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
-| `rules/*.md`（23 个 rules） | `book2skills/`（第三方安装的 skills） |
-| `skills/*/SKILL.md`（5 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
+| `rules/*.md`（28 个 rules） | `book2skills/`（第三方安装的 skills） |
+| `skills/*/SKILL.md`（8 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
-| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`（第三方 symlink） |
+| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`（第三方 symlink） |
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -103,6 +117,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-16 16:35:00] 更新同步范围：rules 23→28，skills 5→8 自建；新增 web-access 到排除清单（第三方 symlink，7 个）
 - [2026-04-15 10:30:00] 更新同步范围：skills 7→7 自建（排除 5 个第三方 symlink），rules 18→19，新增 `.agents/skills/*` 排除
 - [2026-04-15 15:00:00] 新增 fireworks-tech-graph 到排除清单（第三方 symlink，6 个）
 - [2026-04-15 14:30:00] Rules 计数 22→23（新增 zhihu-article.md）
