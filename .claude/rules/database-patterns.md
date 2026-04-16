@@ -73,6 +73,43 @@ for row in source_rows:
 
 SQLite 允许 SELECT 非聚合列而不放在 GROUP BY 中（不像 MySQL 的 `ONLY_FULL_GROUP_BY`）。取的是组内**第一行**的值，如果字段可能不一致需显式聚合函数。
 
+## sensor_data 单行约束
+
+**规则**：`sensor_data` 表每设备每 tick **只写 1 行**。
+
+API 用 `ROW_NUMBER() OVER (PARTITION BY device_id ORDER BY collect_time DESC)` 取最新值。多行同时间戳会导致非确定性行为（随机取值）。
+
+**RealtimeSimulator 三写模型**：
+
+```
+_generate_tick() / _replay_tick()
+  ├── InfluxDB           (SYNCHRONOUS 写入, 秒级时序, 全量参数)
+  ├── device_runtime_data (JSON 格式: 所有参数合为一行)
+  └── sensor_data         (每设备 1 行: 所有参数的平均值)
+```
+
+- API 端点（`/api/projects/<pid>/latest-data`、`/api/cooling/overview/<pid>`）从 `sensor_data` 读取
+- 如果 `sensor_data` 写入路径缺失 → 前端数据显示空白
+
+## RealtimeSimulator PARAM_RANGES 默认陷阱
+
+**问题**：未定义的 `param_code` 落到默认范围 `(0, 100)`，产生无意义数据。
+
+**案例**：COP 正常范围 `2.5-5.5`，默认 `(0, 100)` 产生 `29-96` 的无意义值。
+
+**规则**：新增设备类型时，必须同时在 `PARAM_RANGES` 字典中添加显式范围定义：
+
+```python
+PARAM_RANGES = {
+    'cop': (2.5, 5.5),     # 明确范围
+    'power_meter': (0, 100),
+    # 新设备类型必须在此定义
+}
+```
+
+- `device_params` 表是模拟器加载的前提：设备缺少条目会被跳过
+- 新增设备类型 → 先插入 `device_params` → 再加 `PARAM_RANGES`
+
 ## 维护操作记录
 
 | 操作 | 记录内容 |
@@ -85,4 +122,5 @@ SQLite 允许 SELECT 非聚合列而不放在 GROUP BY 中（不像 MySQL 的 `O
 
 ## ChangeLogs
 
+- [2026-04-16 11:52:00] 补充：sensor_data 单行约束、三写模型、PARAM_RANGES 默认陷阱（来自 04-07~04-08 日志抽象）
 - [2026-04-16 11:15:00] Initial: SQLite 去重模式、VACUUM 流程、级联重复防护、GROUP BY 陷阱

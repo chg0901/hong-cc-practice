@@ -71,12 +71,28 @@ Step 8: Commit + Push + Sync
 
 ## 首次执行记录（2026-04-16）
 
-从 04-09~04-16 共 8 个工作日志中提取 45+ 新 insight，创建：
+### 第一轮：04-09~04-16 日志（8 个文件，45+ insight）
+
 - Rule: `database-patterns.md`（SQLite 去重/VACUUM/级联防护）
 - Memory: `feedback_playwright_patterns.md`（5 个 Playwright 踩坑）
 - Memory: `feedback_settings_hierarchy.md`（全局 vs 项目级配置）
 - Memory 更新: `feedback_windows_env.md`（追加 .env + load_dotenv 陷阱）
 
+### 第二轮：04-03~04-08 日志（5 个文件，30+ insight）
+
+补充到已有 Rule/Memory：
+- Rule 更新: `database-patterns.md`（+sensor_data 单行约束、三写模型、PARAM_RANGES 默认陷阱）
+- Rule 更新: `testing.md`（+Pre-cleanup 测试隔离原则）
+- Rule 更新: `svg-design.md`（+SVG Rendering Pitfalls：pointer-events、CJK 截断、Z-order）
+- Memory 新建: `feedback_flask_gotchas.md`（debug reloader 双进程、AJAX 竞态、dict.get(None) 陷阱）
+
+### 覆盖度
+
+- 两轮合计提取 75+ insight
+- 已覆盖：12 项（5 新建 + 7 更新）
+- 未覆盖原因：多数为一次性 debug、临时性配置、已被代码修复的问题
+
 ## ChangeLogs
 
+- [2026-04-16 12:02:00] 更新首次执行记录：第二轮 04-03~04-08 日志补充，覆盖度统计
 - [2026-04-16 11:15:00] Initial: 每周五自进化规则 + 首次执行记录

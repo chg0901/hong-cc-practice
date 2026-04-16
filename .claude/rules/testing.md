@@ -94,6 +94,34 @@ See [visual-testing.md](visual-testing.md) for full rules on the three-layer tes
 
 测试数据**必须在测试完成后立即清理**，不得残留到下一次测试或影响生产界面。
 
+### 测试隔离：Pre-cleanup 原则
+
+**规则**：永远不要假设数据库为空。每个测试组在开始前必须执行 pre-cleanup。
+
+**为什么**：远期日期（2099）只避免日期冲突，不能防止 `< ?` 查询匹配到历史数据。软删除的测试数据仍会干扰消费量计算。
+
+```python
+# 正确的测试隔离模式
+def test_something():
+    try:
+        # Pre-cleanup: 清理同 project+type 的已有记录
+        existing = get_records(project_id=test_pid, meter_type='water')
+        for rec in existing:
+            delete_record(rec['id'])
+
+        # Run test
+        result = create_record(...)
+        assert result['code'] == 200
+    finally:
+        # Post-cleanup: 删除本测试创建的记录
+        delete_record(result['data']['id'])
+```
+
+**要点**：
+- 使用当天日期（不用 2099），测试数据更真实
+- `reporter` 字段标记为 `test_xxx_{timestamp}`，便于识别
+- Pre-cleanup + post-cleanup 双重保障
+
 ### 清理方式
 
 1. **自动化测试（test_codes/）**：每个测试文件的 `finally` 块中必须用 `DELETE` API 软删除所有测试创建的数据

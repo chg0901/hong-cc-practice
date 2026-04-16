@@ -100,6 +100,27 @@ Controllers are classified into subsystems:
 
 After modifying SVG scene code, the PostToolUse hook auto-triggers `/visual-check`. See [visual-testing.md](visual-testing.md) for the full verification workflow (Playwright + Vision MCP).
 
+## SVG Rendering Pitfalls
+
+### pointer-events 阻塞
+
+不可见的 `<rect>` 背景元素会阻塞子元素的鼠标事件。始终对纯装饰性背景矩形添加 `pointer-events="none"`。
+
+### CJK 感知文本截断
+
+固定字符数（如 7 字符）对中文文本无效（每个 CJK 字符 = 2 宽度单位）。使用宽度感知截断：
+
+```javascript
+const cjkLen = (s) => [...s].reduce((a, c) => a + (/[\u4e00-\u9fff]/.test(c) ? 2 : 1), 0);
+```
+
+### Z-Order 提升模式
+
+展开的分组需要临时提升到 SVG 根节点：
+1. 计算绝对坐标（累加父级 translate）
+2. `appendChild` 移到 SVG 根节点
+3. `mouseleave` 时恢复原始父级和位置
+
 ## ChangeLogs
 
 - [2026-04-13 20:56:00] Simplified verification section: PostToolUse hook now auto-triggers /visual-check
