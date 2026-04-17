@@ -1,6 +1,6 @@
 # Energy Project - Claude Code Configuration
 
-This repo contains the `.claude/` directory configuration for the [Smart Agriculture Big Data Platform](https://gitee.com/chg0901/energy) project.
+This repo contains the `.claude/` directory configuration for a personal project.
 
 ## Structure
 
