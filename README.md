@@ -1,4 +1,4 @@
-# Energy Project - Claude Code Configuration
+# Hong's Claude Code Configuration
 
 This repo contains the `.claude/` directory configuration for a personal project.
 
