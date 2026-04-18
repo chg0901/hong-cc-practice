@@ -128,6 +128,34 @@ Skill-based real browser automation via Chrome CDP Proxy.
 
 **适用场景**: 需登录页面、反爬虫站点、复杂 JS 交互、并行浏览。简单 URL 读取优先使用 `jina read_url` 或 `web-reader`。
 
+### web-access vs Playwright 分工
+
+| 维度 | web-access (CDP) | Playwright (MCP Plugin) |
+|------|-----------------|------------------------|
+| **浏览器** | 用户日常 Chrome（非 headless） | 内置 Chromium（隔离环境） |
+| **登录状态** | 继承用户 Chrome cookies/sessions | 无登录状态，需手动登录 |
+| **反爬虫** | 更难被检测（真实 Chrome 指纹） | 可能被反爬虫检测 |
+| **截图质量** | 一般（CDP captureScreenshot） | 高（支持 fullPage、element、CSS scale） |
+| **DOM 操作** | 通过 CDP Runtime.evaluate（JS 注入） | 语义化 API（click/type/fill/snapshot） |
+| **并行能力** | 子代理各自开 tab，天然并行 | 单浏览器串行，需多 context |
+| **UI 测试** | 不适合（无断言框架） | 适合（snapshot + screenshot + Vision MCP） |
+| **速度** | 快（直连用户 Chrome） | 较快（本地 Chromium） |
+| **稳定性** | 依赖 Chrome CDP 端口开启 | 稳定（自带浏览器） |
+| **配置复杂度** | 需 Chrome `--remote-debugging-port` | 零配置（自动安装） |
+
+**决策规则**：
+
+| 需求 | 首选 | 理由 |
+|------|------|------|
+| 需登录的页面 | web-access | 继承 Chrome 登录态 |
+| 反爬虫站点 | web-access | 真实浏览器指纹 |
+| 并行浏览 3+ 页面 | web-access | 子代理天然并行 |
+| UI 自动化测试 | Playwright | snapshot + screenshot + 断言 |
+| 截图验证 | Playwright | fullPage + 高清 + element 精确 |
+| 表单填写/下拉选择 | Playwright | fill_form + select_option 语义化 |
+| 简单页面交互 | Playwright | 无需 Chrome 预配置 |
+| 已有 tab 操作 | web-access | 操作用户已打开的页面 |
+
 ### Browser Automation
 
 ```
