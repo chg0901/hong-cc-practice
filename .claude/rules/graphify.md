@@ -32,27 +32,61 @@
 
 ```bash
 # 踩点查询（默认 BFS 遍历，2000 token 预算）
-graphify query "<question>"
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify query "<question>"
 
 # 更深遍历（DFS，追踪特定路径）
-graphify query "<question>" --dfs
+... -m graphify query "<question>" --dfs
 
 # 自定义 token 预算
-graphify query "<question>" --budget 1500
+... -m graphify query "<question>" --budget 1500
 
-# 图谱已存在时，手动触发增量更新
-graphify --update
+# 增量重建图谱（AST-only，不需要 LLM，利用 SHA256 cache）
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -c \
+  "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"
 
-# 重建（文件未变化时直接命中缓存）
-graphify
+# 重新生成可视化
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe scripts/gen_graph_viz.py
+
+# 查询 Q&A 反馈保存
+... -m graphify save-result --question "Q" --answer "A" --nodes N1 N2
+
+# Git hooks 状态检查
+... -m graphify hook status
+```
+
+## 更新机制
+
+### 三层更新策略
+
+| 层级 | 触发方式 | 机制 | 说明 |
+|------|---------|------|------|
+| **自动** | git commit / checkout | post-commit/post-checkout hook | 仅当有代码文件变更时触发，SHA256 cache 增量更新 |
+| **手动** | `/graphify-workflow update` | `_rebuild_code()` | 大量变更后手动触发，如 merge 后 |
+| **提醒** | SessionEnd hook | 提示重建 | 会话结束时有代码变更则提醒 |
+
+### Git Hooks（已安装）
+
+```bash
+# 检查 hooks 状态
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify hook status
+# 输出：post-commit: installed / post-checkout: installed
+```
+
+hook 仅在有 `.py .js .ts .go .rs .java .cpp .c` 等代码文件变更时触发，markdown/config 变更不会触发重建。
+
+### 验证更新
+
+更新后检查 `graphify-out/GRAPH_REPORT.md` 的日期和节点数：
+```
+规模：2589 nodes / 5612 edges / 157 communities
 ```
 
 ## Token 成本意识
 
 | 模式 | 构建成本 | 查询成本 |
 |------|---------|---------|
-| AST-only（当前） | 0 token | ~1983 token/query |
-| Phase 2 Semantic | ~27 子代理 × 45k token | ~1983 token/query |
+| AST-only（当前） | 0 token | ~2000 token/query |
+| Phase 2 Semantic | ~27 子代理 x 45k token | ~2000 token/query |
 
 **警告**：Phase 2 语义提取 token 成本极高（可能超过 $1），仅在确实需要跨模语义关联（如设计决策、文档概念）时才使用。
 
@@ -60,13 +94,18 @@ graphify
 
 ```
 位置：     graphify-out/graph.json
-规模：     1,875 nodes / 2,907 edges / 149 communities
-Token 压缩：1423x（vs 全量读取）
+规模：     2589 nodes / 5612 edges / 157 communities
+Token 压缩：~1423x（vs 全量读取）
 构建成本：  0 token (AST-only)
-缓存：     graphify-out/cache/ (158 个文件，SHA256 content-addressable)
+缓存：     graphify-out/cache/ (SHA256 content-addressable)
 ```
 
-图谱基于 tree-sitter AST 提取，仅涵盖 161 个代码文件，不含文档和图片语义。
+图谱基于 tree-sitter AST 提取，涵盖代码文件（.py/.js/.ts 等），不含文档和图片语义。
+
+God Nodes（最核心抽象）：
+1. `DeviceIconLibrary` — 设备图标系统
+2. `SchematicGenerator` — 组态图生成
+3. `DBManager` — 数据库管理
 
 ## 可视化增强
 
@@ -74,24 +113,41 @@ Token 压缩：1423x（vs 全量读取）
 
 `scripts/gen_graph_viz.py` 生成的交互式 HTML 中，边粗细基于两端节点的平均度：
 
-```python
-avg_deg = (degree[src] + degree[tgt]) / 2
-edge_width = max(1, min(5, 1 + 4 * (avg_deg / max_deg)))
-```
-
 - 高度连接节点间的边更粗（最大 5px），视觉突出核心路径
 - 低度节点间的边更细（最小 1px），减少视觉噪声
 - 置信度低的边（非 EXTRACTED）使用虚线 + 低透明度
 
 ### 交互式可视化工作流
 
-代码变更后更新可视化：`/graphify-workflow viz`（或手动运行 `scripts/gen_graph_viz.py`）
+代码变更后更新可视化：`/graphify-workflow viz`
 
-## 代码变更后更新图谱
+## 与五层体系集成
 
-代码变更（新增/删除函数、修改 import、创建新文件）后，应运行 `/graphify-workflow update` 增量更新图谱，保持节点/边与代码同步。
+| Layer | 机制 | Graphify 角色 |
+|-------|------|--------------|
+| L1 Hooks | git post-commit/post-checkout | 自动增量重建图谱 |
+| L2 Rules | 本文件（graphify.md） | 使用规范、触发条件、更新机制 |
+| L3 Skills | graphify-workflow | 操作命令（query/update/viz/hook） |
+| L4 Subagents | context-research (fork) | graphify query 可在隔离上下文中使用 |
+| L5 Memory | GRAPH_REPORT.md | God nodes + community structure 持久化 |
+
+### 使用流程
+
+```
+新会话开始 → 读 GRAPH_REPORT.md 了解全局结构
+  |
+  v
+需要查找代码 → 先 graphify query 获取模块关系 → 再 Read 具体文件
+  |
+  v
+代码变更 → git commit → post-commit hook 自动重建
+  |
+  v
+会话结束 → 确认图谱已更新（如有大量变更，手动 /graphify-workflow update）
+```
 
 ## ChangeLogs
 
+- [2026-04-17 15:30:00] 大幅更新：重建图谱（2589/5612/157）、新增更新机制章节、五层体系集成、修正命令（_rebuild_code 替代不存在的 --update）、安装 git hooks
 - [2026-04-14 09:30:00] 新增度加权边粗细说明、可视化工作流、代码变更后更新规则
 - [2026-04-13 — Initial: 触发条件、使用时机、执行命令、token 成本](changes/2026-04-13)

@@ -2,7 +2,7 @@
 name: graphify-workflow
 description: Use graphify knowledge graph for token-efficient code navigation. After code changes, update the graph. Trigger: /graphify-workflow
 user-invocable: true
-argument-hint: "[query|update|viz]"
+argument-hint: "[query|update|viz|hook]"
 ---
 
 # Graphify Workflow Skill
@@ -18,16 +18,27 @@ Search the knowledge graph for module-level connections:
 NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify query "<question>"
 ```
 
+Options:
+- `--dfs` — depth-first traversal (trace specific paths)
+- `--budget N` — cap output at N tokens (default 2000)
+- `--graph <path>` — custom graph.json path
+
 Best for: "what calls function X", "which modules import Y", "trace the call chain for Z"
 
 ### `/graphify-workflow update`
 
-Incrementally update the graph after code changes:
+Incrementally rebuild the graph (AST-only, no LLM needed). Uses SHA256 content-addressable cache — only changed files are re-extracted:
 ```bash
-NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify --update
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -c \
+  "from graphify.watch import _rebuild_code; from pathlib import Path; print(_rebuild_code(Path('.')))"
 ```
 
-Run after: adding/removing functions, creating new files, modifying imports
+Run after: adding/removing functions, creating new files, modifying imports.
+
+After rebuild, regenerate visualization:
+```bash
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe scripts/gen_graph_viz.py
+```
 
 ### `/graphify-workflow viz`
 
@@ -38,7 +49,26 @@ NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe scripts/gen_graph
 
 Open: `start graphify-out/graph_viz.html`
 
-## When to Use
+### `/graphify-workflow hook`
+
+Check graphify git hooks installation status:
+```bash
+NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify hook status
+```
+
+To install: `NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe -m graphify hook install`
+
+## When to Rebuild
+
+| Scenario | Auto/Manual | Trigger |
+|----------|------------|---------|
+| git commit | Auto | post-commit hook (if installed) |
+| git checkout/switch branch | Auto | post-checkout hook (if installed) |
+| After bulk file changes | Manual | `/graphify-workflow update` |
+| Need latest visualization | Manual | `/graphify-workflow viz` |
+| Session end with code changes | Reminder | SessionEnd hook |
+
+## When to Use graphify vs Alternatives
 
 | Scenario | Use graphify? | Alternative |
 |----------|--------------|-------------|
@@ -53,12 +83,22 @@ Open: `start graphify-out/graph_viz.html`
 ## Token Savings
 
 Graphify returns module-level connections, not full file contents:
-- 1875 nodes / 2907 edges compressed into ~2000 tokens
+- ~1875 nodes / ~2907 edges compressed into ~2000 tokens
 - vs ~50,000+ tokens to read all source files
 - ~1423x compression ratio
 
+## Five-Layer Integration
+
+| Layer | Mechanism | Graphify Role |
+|-------|-----------|---------------|
+| L1 Hooks | PreToolUse(Glob\|Grep) + git hooks | Auto-remind + auto-rebuild |
+| L2 Rules | graphify.md | Usage norms and triggers |
+| L3 Skills | This skill | Operation steps and commands |
+| L4 Subagents | context-research | graphify query in forked context |
+| L5 Memory | GRAPH_REPORT.md | God nodes + community structure |
+
 ## Graph Stats
 
-Current: 1875 nodes, 2907 edges, 149 communities
+Check current stats: read `graphify-out/GRAPH_REPORT.md`
 Source: `graphify-out/graph.json`
 Visualization: `graphify-out/graph_viz.html` (vis.js interactive)
