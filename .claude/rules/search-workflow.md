@@ -13,6 +13,7 @@
 | 1 | jina `search_web` | Free tier | 1000/mo | 英文技术内容搜索 |
 | 1 | jina `read_url` | Free tier | 1000/mo | URL→Markdown（含 PDF、SPA） |
 | 1 | jina `search_arxiv` | Free tier | 1000/mo | 学术论文搜索 |
+| 1.5 | baidu-search (CLI) | Free | 100/day | 中文本地化搜索（政策/法规/补贴）、时间过滤 |
 | 2 | web-search-prime | Shared | Lite 100/Pro 1K/Max 4K | 中文网页搜索 |
 | 2 | web-reader | Shared | 同上 | URL→Markdown |
 | 3 | zread | Independent | Same tiers | GitHub 仓库浏览 |
@@ -25,7 +26,9 @@
 ```
 IF 库/框架文档        → context7 (Tier 0)
 IF 快速事实           → WebSearch built-in (Tier 0)
-IF 中文内容           → web-search-prime (Tier 2) → fallback jina search_web (Tier 1)
+IF 中文内容           → baidu-search (Tier 1.5) → fallback web-search-prime (Tier 2)
+IF 中文政策/法规/补贴 → baidu-search (Tier 1.5) ← 唯一首选（百度索引最优）
+IF 中文 + 时间过滤   → baidu-search --recency (Tier 1.5)
 IF 英文技术内容       → jina search_web (Tier 1) → fallback web-search-prime (Tier 2)
 IF 学术论文           → jina search_arxiv (Tier 1)
 IF PDF 提取           → jina read_url (Tier 1)
@@ -45,7 +48,8 @@ IF 复杂网页交互       → web-access (Tier 4) → fallback playwright (Tie
 | 通用研究 | context7 + jina search_web + web-search-prime | 3 独立源，无配额冲突 |
 | 库深度研究 | context7 + zread + jina search_web | 文档 + 源码 + 网页 |
 | 学术主题 | jina search_arxiv + jina search_web + web-search-prime | 3 源交叉验证 |
-| 中文市场 | web-search-prime + MiniMax web_search | 2 中文源 |
+| 中文市场 | baidu-search + web-search-prime | 2 独立中文源（百度 vs 智谱） |
+| 中文政策/法规 | baidu-search --recency month + jina search_web | 中文本地 + 英文交叉验证 |
 | 登录态+公开对比 | web-access + jina search_web + web-search-prime | 登录内容 + 公开搜索 |
 
 ### 禁止并行
@@ -140,7 +144,8 @@ mcp__plugin_jina-mcp-server__search_web(query="...")
 | Primary | Fallback 1 | Fallback 2 | Fallback 3 |
 |---------|-----------|-----------|-----------|
 | context7 | jina search_web | web-search-prime | MiniMax web_search |
-| web-search-prime | jina search_web | MiniMax web_search | WebSearch built-in |
+| baidu-search | web-search-prime | jina search_web | MiniMax web_search |
+| web-search-prime | baidu-search | jina search_web | MiniMax web_search |
 | web-reader | jina read_url | playwright navigate | web-access |
 | zread | jina read_url | GitHub plugin | web-access |
 | jina search_web | web-search-prime | MiniMax web_search | WebSearch built-in |
@@ -153,6 +158,7 @@ mcp__plugin_jina-mcp-server__search_web(query="...")
 | Shared | web-search-prime + web-reader | 月末保留 20% 供关键搜索 |
 | Independent (zhipu) | zread | 独立配额，不过度使用 |
 | Independent (jina) | jina 20 工具 | Free tier，无紧迫限制 |
+| Independent (baidu) | baidu-search | 100 次/天，仅用于中文本地化场景 |
 | Independent (MiniMax) | MiniMax | API plan 内 |
 | Free | context7, WebSearch, Playwright, web-access | 无限制 |
 
@@ -227,4 +233,5 @@ mcp__plugin_jina-mcp-server__search_web(query="...")
 
 ## ChangeLogs
 
+- [2026-04-20 — 新增 baidu-search (Tier 1.5)：中文本地化搜索 + 时间过滤，100 次/天独立配额，决策树 + 回退链 + 并行策略更新]
 - [2026-04-16 — Initial: 工具分级 Tier 0-4、并行搜索策略、交叉验证协议、搜索报告模板、失败回退链、配额感知、触发规则、自适应深度、web-access 指南](changes/2026-04-16)

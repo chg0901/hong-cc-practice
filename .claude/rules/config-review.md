@@ -102,11 +102,12 @@ bash scripts/sync_claude_config.sh --push
 | 包含 | 排除（原因） |
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
-| `rules/*.md`（28 个 rules） | `book2skills/`（第三方安装的 skills） |
+| `rules/*.md`（30 个 rules） | `book2skills/`（第三方安装的 skills） |
 | `skills/*/SKILL.md`（8 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
+| — | `baidu-search/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
-| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`（第三方 symlink） |
+| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`（第三方 symlink）、`baidu-search/`（第三方安装） |
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -117,6 +118,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-20 13:35:00] 更新同步范围：rules 28→30（+secrets.md +context-management.md），新增 baidu-search 到排除清单
 - [2026-04-16 16:35:00] 更新同步范围：rules 23→28，skills 5→8 自建；新增 web-access 到排除清单（第三方 symlink，7 个）
 - [2026-04-15 10:30:00] 更新同步范围：skills 7→7 自建（排除 5 个第三方 symlink），rules 18→19，新增 `.agents/skills/*` 排除
 - [2026-04-15 15:00:00] 新增 fireworks-tech-graph 到排除清单（第三方 symlink，6 个）

@@ -1,6 +1,6 @@
 # MCP Server Usage Rules
 
-## Available MCP Servers (26 total)
+## Available MCP Servers (26 total) + 1 Skill-based Search
 
 ### Custom Servers (.claude.json) — 7 servers
 
@@ -127,6 +127,41 @@ Skill-based real browser automation via Chrome CDP Proxy.
 - 支持视频分析（seek + 截帧）
 
 **适用场景**: 需登录页面、反爬虫站点、复杂 JS 交互、并行浏览。简单 URL 读取优先使用 `jina read_url` 或 `web-reader`。
+
+### baidu-search (CLI Skill)
+
+百度千帆 AI Search，Python CLI 工具（非 MCP Server），位于 `~/.claude/skills/baidu-search/`。
+
+**安装**: 已安装（`~/.claude/skills/baidu-search/scripts/search.py`）
+**API Key**: 存储在 `scripts/config.json` + `.env`（`BAIDU_API_KEY`）
+
+**调用方式**:
+```bash
+# 网页搜索（默认）
+D:/miniconda3/envs/ene/python.exe ~/.claude/skills/baidu-search/scripts/search.py "关键词" --json
+
+# 时间过滤
+... search.py "关键词" --recency week   # week/month/semiyear/year
+
+# 百科/AI 模式
+... search.py "关键词" --api-type baike   # baike/miaodong_baike/ai_chat
+```
+
+**vs 现有中文搜索工具**:
+
+| 维度 | baidu-search | web-search-prime (Zhipu) | jina search_web |
+|------|-------------|-------------------------|-----------------|
+| 中文搜索质量 | 百度索引，最优 | 中等 | 弱 |
+| 时间过滤 | `--recency` week/month/year | `search_recency_filter` | 无 |
+| 配额 | 100 次/天（独立） | Shared pool | Free tier |
+| 返回内容 | 结构化 JSON（标题+摘要+URL+日期） | 摘要 | 完整内容 |
+
+**使用场景（仅以下情况首选）**:
+1. 中国政策/法规/补贴等中文本地化搜索
+2. 需要精确时间过滤的中文搜索（过去 7 天/1 月的新闻）
+3. 中文内容搜索时作为 web-search-prime 的替代
+
+**完整搜索工作流规范**: [search-workflow.md](search-workflow.md)（Tier 1.5 定位）
 
 ### web-access vs Playwright 分工
 
@@ -289,6 +324,7 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 
 ## ChangeLogs
 
+- [2026-04-20 13:25:00] Added baidu-search CLI skill (Tier 1.5): 百度千帆 AI Search, 100/day, 中文本地化搜索 + 时间过滤; updated title to "26 total + 1 Skill-based Search"
 - [2026-04-16 16:30:00] Added web-access (eze-is) skill-based server; updated total 25→26; added web-access section + search tool selection rows; added search-workflow.md pointer
 - [2026-04-15 16:20:00] Added jina-mcp-server (remote HTTP, 20 tools); updated custom servers 6→7; added Jina tool usage priority + rerank strategy + collaboration flow; MCP total 24→25
 - [2026-04-14 16:00:00] Added MiniMax Coding Plan MCP section (package, API host, tools, docs URL); clarified MiniMax vs ZAI separation; added `query` vs `search_query` param distinction
