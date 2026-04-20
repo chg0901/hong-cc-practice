@@ -81,3 +81,19 @@
 ## Other
 - `GET /api/regions` - Province/city/district address data
 - `GET/POST /api/system/settings` - Get/Update system settings
+
+## Device Query (系统运行监控 - 设备级数据查询)
+- `GET /api/device-query/companies` - Company list (multi-tenant filtered)
+- `GET /api/device-query/projects` - Project list (?company= filter)
+- `GET/POST /api/device-query/devices` - Device list with system classification
+- `GET /api/device-query/params/<id>` - Device parameters
+- `GET /api/device-query/config-params/<id>` - Configurable parameters
+- `POST /api/device-query/config-params/<id>` - Update configurable parameters
+- `POST /api/device-query/config-params/<id>/reset` - Reset to defaults
+- `POST /api/device-query/query` - Data query with pagination
+- `POST /api/device-query/chart-data` - Trend chart data (?aggregate=raw/5min/hour/day)
+- `POST /api/device-query/export` - Generate Excel export
+- `GET /api/device-query/download` - Download exported file (?filepath=)
+- `GET /api/device-query/device-types` - Available device types
+- `GET /api/device-query/type-params/<type>` - Parameters for a device type
+- `POST /api/device-query/compare` - Cross-device parameter comparison
