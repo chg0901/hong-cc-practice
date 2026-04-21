@@ -1,6 +1,6 @@
 # MCP Server Usage Rules
 
-## Available MCP Servers (26 total) + 1 Skill-based Search
+## Available MCP Servers (26 total) + 1 Skill-based Search + 1 GitHub MCP
 
 ### Custom Servers (.claude.json) — 7 servers
 
@@ -190,6 +190,35 @@ D:/miniconda3/envs/ene/python.exe ~/.claude/skills/baidu-search/scripts/search.p
 | 表单填写/下拉选择 | Playwright | fill_form + select_option 语义化 |
 | 简单页面交互 | Playwright | 无需 Chrome 预配置 |
 | 已有 tab 操作 | web-access | 操作用户已打开的页面 |
+
+### GitHub MCP (github@claude-plugins-official)
+
+GitHub MCP Server 提供 26 个工具，涵盖仓库管理、Issue/PR 自动化、代码搜索。
+
+**配置状态**：已在 `~/.claude/settings.json` 的 `env.GITHUB_PERSONAL_ACCESS_TOKEN` 配置完成。
+
+**重要**：存在两个 GitHub MCP 版本：
+- `@modelcontextprotocol/server-github`（已归档，26 个工具，本项目使用）
+- `github/github-mcp-server`（GitHub 官方，活跃维护，支持 toolsets 按需启用）
+
+**核心工具速查**：
+
+| 工具 | 功能 |
+|------|------|
+| `get_file_contents` | 读取仓库文件/目录（任意分支） |
+| `search_code` | GitHub 代码搜索（language:/repo:/path: 语法）|
+| `search_repositories` | 搜索仓库（stars/语言/时间过滤）|
+| `create_issue` / `list_issues` / `update_issue` | Issue CRUD |
+| `create_pull_request` / `get_pull_request_files` | PR 创建和变更查看 |
+| `create_pull_request_review` | 提交 Code Review（APPROVE/REQUEST_CHANGES/COMMENT）|
+| `merge_pull_request` | 合并 PR |
+| `push_files` | 批量推送文件（单次 commit 多文件）|
+
+**适用场景**：仓库调研、Issue 批量管理、PR 审查、代码搜索。
+
+**详细工作流规范**：[github-mcp-workflow.md](github-mcp-workflow.md)
+
+**完整使用指南**：[docs/github_mcp_guide.md](../docs/github_mcp_guide.md)（含知乎格式文档）
 
 ### Browser Automation
 

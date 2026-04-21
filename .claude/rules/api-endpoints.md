@@ -32,8 +32,10 @@
 ## Weather API (QWeather)
 - `GET /api/weather/now` - Current weather
 - `GET /api/weather/24h` - 24-hour forecast
+- `GET /api/weather/72h` - 72-hour forecast (from 168h API, first 72 entries)
 - `GET /api/weather/7d` - 7-day forecast
 - `GET /api/weather/30d` - 30-day forecast (simulated)
+- `GET /api/weather/sensor/latest` - Latest local sensor data (?project_id=)
 
 ## Device Control
 - `POST /api/device/control/<did>` - Remote control (requires can_control=1)
