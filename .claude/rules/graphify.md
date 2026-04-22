@@ -63,6 +63,7 @@ NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe scripts/gen_graph
 | **自动** | git commit / checkout | post-commit/post-checkout hook | 仅当有代码文件变更时触发，SHA256 cache 增量更新 |
 | **手动** | `/graphify-workflow update` | `_rebuild_code()` | 大量变更后手动触发，如 merge 后 |
 | **提醒** | SessionEnd hook | 提示重建 | 会话结束时有代码变更则提醒 |
+| **不触发** | git push（Gitee/GitHub） | 无 | push 是服务端操作，客户端 hook 不在 push 时运行；图谱已在 commit 时更新，push 无需额外操作 |
 
 ### Git Hooks（已安装）
 
@@ -148,6 +149,7 @@ God Nodes（最核心抽象）：
 
 ## ChangeLogs
 
+- [2026-04-22 — 三层更新策略表补充"push 不触发"说明（git push 是服务端操作，客户端 hook 不触发）]
 - [2026-04-17 15:30:00] 大幅更新：重建图谱（2589/5612/157）、新增更新机制章节、五层体系集成、修正命令（_rebuild_code 替代不存在的 --update）、安装 git hooks
 - [2026-04-14 09:30:00] 新增度加权边粗细说明、可视化工作流、代码变更后更新规则
 - [2026-04-13 — Initial: 触发条件、使用时机、执行命令、token 成本](changes/2026-04-13)

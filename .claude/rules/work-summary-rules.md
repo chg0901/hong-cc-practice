@@ -128,6 +128,7 @@ When adding test files:
 2. **更新 ChangeLogs**：在工作日志和 CLAUDE.md 中添加新条目，**时间戳必须用 `date '+%H:%M:%S'` 获取实际主机时间**
 3. **文档一致性检查**：对比 work_summary / CLAUDE.md / changelog.md 三处 ChangeLogs，确保无遗漏无矛盾
 4. **Git commit**：`git add` 所有变更文件（`.claude/` 文件需 `git add -f`）+ `git commit`
+4b. **Graphify 验证**（仅当有代码文件 `.py/.js/.ts` 变更时）：post-commit hook 会自动重建图谱；确认方式：检查 `graphify-out/GRAPH_REPORT.md` 时间戳是否已更新；若未更新（hook 未触发）则手动运行 `/graphify-workflow update`
 5. **Git push Gitee**：`NO_PROXY=gitee.com git push origin main`
 6. **GitHub 同步**：`bash scripts/sync_claude_config.sh --push`（仅当修改了 `.claude/` 文件时）
 7. **报告状态**：告知用户提交完成（commit hash + 文件数 + 是否同步 GitHub）
@@ -141,4 +142,5 @@ When adding test files:
 
 - [2026-04-15 11:00:00] 新增 Task-Batch Commit Checkpoint 规则
 - [2026-04-16 09:38:00] 新增时间戳必须使用实际主机时间规则（不得编造/估算）
+- [2026-04-22] Commit Checkpoint 新增步骤 4b（graphify 验证：post-commit hook 自动重建，检查时间戳，若未触发则手动 update）
 - [2026-04-16 09:49:00] Commit Checkpoint 新增步骤 3（文档一致性检查）+ 明确双仓库同步要求

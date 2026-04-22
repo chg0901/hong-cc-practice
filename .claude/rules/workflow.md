@@ -63,6 +63,8 @@ git commit -m "描述本次变更"
 # 2. 合并回 main
 git checkout main
 git merge --no-ff YYYY-MM-DD -m "feat/fix/docs: 今日工作摘要"
+# merge commit 会触发 post-commit hook，graphify 自动重建（代码文件变更时）
+# 若有大量代码变更，可手动验证：head -5 graphify-out/GRAPH_REPORT.md
 
 # 3. 推送到 Gitee（主仓库）
 NO_PROXY=gitee.com git push origin main
