@@ -1,6 +1,6 @@
 # Hong's Claude Code Practice
 
-Personal Claude Code configuration and extensibility system for the [Smart Agriculture Big Data Platform](https://gitee.com/chg0901/energy) (energy project).
+Personal Claude Code configuration and extensibility practices — rules, skills, agents, and hooks accumulated from real-world project development. Currently applied to a [Flask-based IoT management platform](https://gitee.com/chg0901/energy) but the patterns are reusable across projects.
 
 ## Structure
 
@@ -11,9 +11,11 @@ Personal Claude Code configuration and extensibility system for the [Smart Agric
 │   ├── mcp-search.md
 │   ├── teams.md
 │   └── test-runner.md
-├── rules/             # L2 Rules (auto-loaded, 29 files)
+├── rules/             # L2 Rules (auto-loaded, 32 files)
 │   ├── api-endpoints.md
 │   ├── config-review.md
+│   ├── context-hygiene.md
+│   ├── context-management.md
 │   ├── daily-review.md
 │   ├── database.md
 │   ├── database-patterns.md
@@ -23,6 +25,7 @@ Personal Claude Code configuration and extensibility system for the [Smart Agric
 │   ├── file-migration.md
 │   ├── fireworks-tech-graph.md
 │   ├── friday-review.md
+│   ├── github-mcp-workflow.md
 │   ├── graphify.md
 │   ├── manual-testing.md
 │   ├── mcp-servers.md
@@ -41,7 +44,8 @@ Personal Claude Code configuration and extensibility system for the [Smart Agric
 │   ├── workflow.md
 │   ├── work-summary-rules.md
 │   └── zhihu-article.md
-├── skills/            # L3 Skills (on-demand, 5 project-created)
+├── skills/            # L3 Skills (on-demand, 6 project-created)
+│   ├── doc-trim/          # CLAUDE.md/rules trimming + README linkage
 │   ├── graphify-workflow/  # Knowledge graph navigation & visualization
 │   ├── interaction-check/  # JS interaction testing (Playwright)
 │   ├── long-screenshot/    # Long page screenshot (Playwright)
@@ -55,8 +59,8 @@ Personal Claude Code configuration and extensibility system for the [Smart Agric
 | Layer | Mechanism | Count | Files |
 |-------|-----------|-------|-------|
 | L1 | Hooks | 5 | `settings.json` (project) + `~/.claude/settings.json` (global) |
-| L2 | Rules | 29 | `rules/*.md` (auto-loaded per session) |
-| L3 | Skills | 14 | 5 project-created + 3 third-party installed + 6 third-party symlinks |
+| L2 | Rules | 32 | `rules/*.md` (auto-loaded per session) |
+| L3 | Skills | 21 | 6 project-created + 5 third-party installed + 3 baidu/excalidraw/book2skills + 7 third-party symlinks |
 | L4 | Subagents | 4 | `agents/*.md` (test-runner, doc-writer, mcp-search, teams) |
 | L5 | Agent Teams | 3 templates | `agents/teams.md` (experimental) |
 | Foundation | Memory | 17 files | `~/.claude/projects/d--Proj-energy/memory/` (not in this repo) |
@@ -103,8 +107,8 @@ bash scripts/sync_claude_config.sh --push   # commit + push to GitHub
 
 Synced content:
 - `agents/*.md` (4 agents)
-- `rules/*.md` (29 rules)
-- `skills/*/SKILL.md` (5 project-created skills only)
+- `rules/*.md` (32 rules)
+- `skills/*/SKILL.md` (6 project-created skills only)
 - `settings.json` (hooks config, no secrets)
 
 ## Excluded (never synced)
@@ -123,6 +127,11 @@ Synced content:
 | hong-cc-practice | `.claude/` config backup | `github.com/chg0901/hong-cc-practice` |
 
 ## Changelog
+
+### 2026-04-22
+- Decoupled README from specific project name — now describes generic Claude Code practices
+- Updated counts: rules 29->32 (+context-hygiene, +context-management, +github-mcp-workflow), skills 14->21 (+doc-trim, +excalidraw-diagram-generator, +baidu-search, +fireworks-tech-graph)
+- Added doc-trim skill for automated CLAUDE.md/rules trimming
 
 ### 2026-04-17
 - Updated README: rules 18->29, skills 4->14 (5 project + 3 installed + 6 symlinks + 1 global)
