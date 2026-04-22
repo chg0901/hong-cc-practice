@@ -96,6 +96,23 @@ D:/miniconda3/envs/ene/python.exe scripts/stitch_segments.py seg_*.png -o output
 mcp__MiniMax__understand_image -> "Verify: all content captured? No truncation? All rows visible?"
 ```
 
+## 与图表工具的联动
+
+截长图工具链针对**网页页面**截图。图表文件的验证路径不同：
+
+| 图表工具 | 验证方式 | 是否需要截长图 |
+|---------|---------|--------------|
+| Mermaid (`.mmd` → `.png`) | Vision MCP 直接分析 PNG 文件 | 否 |
+| fireworks-tech-graph (`.svg` → `.png`) | Vision MCP + ZAI OCR 分析 PNG | 否 |
+| Excalidraw (`.excalidraw`) | 在浏览器中打开 excalidraw.com 后截图验证 | **可能需要**（页面较长时用 L2） |
+
+**Excalidraw 浏览器验证流程**（需要截图时）：
+1. `browser_navigate` → `https://excalidraw.com`
+2. 上传 `.excalidraw` 文件（File → Open）
+3. 检测页面高度：若画布内容超出视口，使用 L2 viewport 扩展截图
+4. `mcp__MiniMax__understand_image` 验证图表内容完整性
+
 ## ChangeLogs
 
+- [2026-04-22] 新增"与图表工具的联动"章节：Mermaid/fireworks/Excalidraw 验证路径对比，Excalidraw 浏览器验证流程
 - [2026-04-15] 初始版本：4 级工具层级、本项目 main.content 滚动容器检测、viewport 扩展标准操作

@@ -4,17 +4,25 @@
 
 当需要生成独立的高清技术架构图（非 inline markdown 图表）时使用 fireworks-tech-graph Skill。
 
-## 与 Mermaid 的分工
+## 三工具分工（Mermaid / fireworks-tech-graph / Excalidraw）
 
-| 工具 | 用途 | 文件格式 | 质量验证 |
-|------|------|---------|---------|
-| Mermaid (`mmdc`) | 嵌入 markdown 文档的 inline 图表 | `.mmd` → `.png` | Vision MCP 检查文字渲染 |
-| fireworks-tech-graph | 独立出版级 SVG 架构图 | `.svg` → `.png` | Vision MCP + OCR 交叉验证 |
+| 工具 | 用途 | 文件格式 | 输出 | 质量验证 |
+|------|------|---------|------|---------|
+| Mermaid (`mmdc`) | 文档内联图表、快速流程图 | `.mmd` → `.png` | 静态 PNG | Vision MCP 检查文字渲染 |
+| fireworks-tech-graph | 出版级 SVG 架构图（7 风格 × 14 类型） | `.svg` → `.png` | 静态 PNG | Vision MCP + OCR 交叉验证 |
+| Excalidraw | 手绘风格可编辑图、协作白板、概念图 | `.excalidraw` JSON | 可编辑文件 | 在 Excalidraw 网页/VS Code 中打开验证 |
 
 **选择规则**：
-- 文档内联图表、流程图 → Mermaid
-- PPT 用图、README 头图、独立架构图 → fireworks-tech-graph
-- 需要多风格切换 → fireworks-tech-graph
+- 文档内联图表、流程图、ER 图 → **Mermaid**（直接嵌入 markdown，mmdc 渲染 PNG）
+- PPT 用图、README 头图、出版级架构图、多风格切换 → **fireworks-tech-graph**（SVG → PNG）
+- 手绘风格、可编辑协作图、概念图、白板草图 → **Excalidraw**（输出 `.excalidraw` 文件）
+- 学习/教学场景的概念图 → **Excalidraw**（sigma skill 内置支持）
+
+**Excalidraw 注意事项**：
+- 输出是 `.excalidraw` JSON，不是直接可用的 PNG
+- 需在 [excalidraw.com](https://excalidraw.com) 或 VS Code Excalidraw 插件中打开
+- 如需 PNG，在 Excalidraw 中 Export → PNG
+- 存放位置：`docs/diagrams/<name>.excalidraw`
 
 ## 生成 Workflow
 
@@ -118,5 +126,5 @@ white_ratio = (arr.mean(axis=2) > 250).mean()
 
 ## ChangeLogs
 
-- [2026-04-15 17:00:00] 新增 Jina MCP 协作场景（search_web/read_url/search_arxiv → 架构图生成流水线）
+- [2026-04-22 — 三工具分工表：新增 Excalidraw（手绘/协作/概念图），更新选择规则]
 - [2026-04-15 16:30:00] Initial: 生成规则、Mermaid 分工、质量验证三步流程、风格选择参考

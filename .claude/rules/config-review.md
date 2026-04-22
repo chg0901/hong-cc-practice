@@ -106,6 +106,7 @@ bash scripts/sync_claude_config.sh --push
 | `skills/*/SKILL.md`（8 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | — | `baidu-search/`（第三方安装的 skills） |
+| — | `excalidraw-diagram-generator/`（第三方安装的 skills） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
 | — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`（第三方 symlink）、`baidu-search/`（第三方安装） |
 
@@ -118,6 +119,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-22] 新增 excalidraw-diagram-generator 到排除清单（第三方安装，5 个）
 - [2026-04-20 13:35:00] 更新同步范围：rules 28→30（+secrets.md +context-management.md），新增 baidu-search 到排除清单
 - [2026-04-16 16:35:00] 更新同步范围：rules 23→28，skills 5→8 自建；新增 web-access 到排除清单（第三方 symlink，7 个）
 - [2026-04-15 10:30:00] 更新同步范围：skills 7→7 自建（排除 5 个第三方 symlink），rules 18→19，新增 `.agents/skills/*` 排除

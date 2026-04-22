@@ -93,7 +93,7 @@ graphify-workflow, interaction-check, visual-check, manual-review, long-screensh
 
 ### 第三方 Skills（git clone/npm 安装，不同步到 GitHub）
 
-book2skills, create-colleague, context-research, baidu-search
+book2skills, create-colleague, context-research, baidu-search, excalidraw-diagram-generator
 
 ### 第三方 Skills（symlink，npx 管理，不同步到 GitHub）
 
@@ -101,6 +101,7 @@ book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-
 
 ## ChangeLogs
 
+- [2026-04-22] 新增 excalidraw-diagram-generator（github/awesome-copilot，手动 clone 安装，第三方 5 个）
 - [2026-04-20 13:35:00] 新增 baidu-search 到第三方 skills（4个）；修正 symlink 列表补充 fireworks-tech-graph
 - [2026-04-16 16:35:00] 新增 web-access 到第三方 symlink skills（7个）；新增 search-workflow.md 到 Step 2 更新清单
 - [2026-04-15 14:30:00] 新增 fireworks-tech-graph 到第三方 symlink skills（7个）
