@@ -104,17 +104,17 @@ mcp__MiniMax__understand_image -> "Verify: all content captured? No truncation? 
 |---------|---------|--------------|
 | Mermaid (`.mmd` → `.png`) | Vision MCP 直接分析 PNG 文件 | 否 |
 | fireworks-tech-graph (`.svg` → `.png`) | Vision MCP + ZAI OCR 分析 PNG | 否 |
-| Excalidraw (`.excalidraw` → `.svg`/`.png`) | `@excalidraw/cli` 导出 → Vision MCP 直接分析 PNG | 否 |
+| Excalidraw (`.excalidraw` → `.svg`/`.png`) | `excalidraw-brute-export-cli` 导出 → Vision MCP 分析 PNG | 否 |
 
-**Excalidraw 导出命令**（`@excalidraw/cli`）：
+**Excalidraw 导出命令**（`excalidraw-brute-export-cli`）：
 
 ```bash
-# 推荐：透明背景 + 高清
-excalidraw diagram.excalidraw -o diagram.svg --padding 15 --background transparent --scale 2
+# 推荐：透明背景 + SVG
+npx excalidraw-brute-export-cli -i diagram.excalidraw --background 0 --scale 2 --format svg -o diagram.svg
 ```
 
 ## ChangeLogs
 
-- [2026-04-22] Excalidraw 验证路径更新：`@excalidraw/cli` 导出 PNG + Vision MCP，不再需要浏览器截图
+- [2026-04-22] Excalidraw 验证路径修正：`excalidraw-brute-export-cli`（Playwright+Firefox headless）替代不存在的 `@excalidraw/cli`
 - [2026-04-22] 新增"与图表工具的联动"章节：Mermaid/fireworks/Excalidraw 验证路径对比
 - [2026-04-15] 初始版本：4 级工具层级、本项目 main.content 滚动容器检测、viewport 扩展标准操作

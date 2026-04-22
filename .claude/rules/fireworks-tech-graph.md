@@ -10,41 +10,60 @@
 |------|------|---------|------|---------|
 | Mermaid (`mmdc`) | 文档内联图表、快速流程图 | `.mmd` → `.png` | 静态 PNG | Vision MCP 检查文字渲染 |
 | fireworks-tech-graph | 出版级 SVG 架构图（7 风格 × 14 类型） | `.svg` → `.png` | 静态 PNG | Vision MCP + OCR 交叉验证 |
-| Excalidraw | 手绘风格可编辑图、协作白板、概念图 | `.excalidraw` → SVG/PNG | 静态 PNG | Vision MCP 直接分析导出 PNG |
+| Excalidraw | 手绘风格可编辑图、协作白板、概念图 | `.excalidraw` JSON → CLI 导出 SVG/PNG | 静态 PNG（需 CLI 导出） | Vision MCP 分析导出 PNG |
 
 **选择规则**：
 - 文档内联图表、流程图、ER 图 → **Mermaid**（直接嵌入 markdown，mmdc 渲染 PNG）
 - PPT 用图、README 头图、出版级架构图、多风格切换 → **fireworks-tech-graph**（SVG → PNG）
-- 手绘风格、可编辑协作图、概念图、白板草图 → **Excalidraw**（输出 `.excalidraw` 文件）
+- 手绘风格、可编辑协作图、概念图、白板草图 → **Excalidraw**（输出 `.excalidraw` JSON 文件）
 - 学习/教学场景的概念图 → **Excalidraw**（sigma skill 内置支持）
 
-**Excalidraw 导出（`@excalidraw/cli` 官方工具）**：
+**Excalidraw 导出**（`excalidraw-brute-export-cli`，第三方工具，使用 Playwright+Firefox headless 渲染）：
 
 ```bash
 # 安装（只需一次）
-npm install -g @excalidraw/cli
+npm install -g excalidraw-brute-export-cli
+npx playwright install firefox
 
-# 推荐：透明背景 + 高清 + 边距
-excalidraw diagram.excalidraw -o diagram.svg --padding 15 --background transparent --scale 2
+# 推荐：透明背景 + SVG 格式
+npx excalidraw-brute-export-cli \
+  -i diagram.excalidraw \
+  --background 0 \
+  --embed-scene 0 \
+  --dark-mode 0 \
+  --scale 2 \
+  --format svg \
+  -o diagram.svg
 
-# 批量导出
-for f in *.excalidraw; do excalidraw "$f" -o "${f%.excalidraw}.svg" --padding 15 --background transparent; done
+# 导出 PNG
+npx excalidraw-brute-export-cli \
+  -i diagram.excalidraw \
+  --background 1 \
+  --scale 2 \
+  --format png \
+  -o diagram.png
 ```
 
 | 参数 | 作用 |
 |------|------|
-| `-o 文件名` | 输出路径（支持 .svg / .png） |
-| `--padding N` | 导出边距（推荐 15） |
-| `--background transparent` | 透明背景 |
-| `--scale 2` | 2x 高清 |
-| `--all-sheets` | 所有画板 |
+| `-i 文件名` | 输入 .excalidraw 文件路径 |
+| `-o 文件名` | 输出路径（.svg 或 .png） |
+| `--format svg\|png` | 输出格式 |
+| `--background 0\|1` | 0=透明背景，1=包含背景 |
+| `--scale 1\|2\|3` | 缩放倍数（推荐 2） |
+| `--dark-mode 0\|1` | 暗色模式 |
+| `--embed-scene 0\|1` | 是否嵌入场景数据（可再编辑） |
 
 **Excalidraw 完整工具链**：
 ```
-Skill 生成 .excalidraw → @excalidraw/cli 导出 SVG/PNG → Vision MCP 验证 → 文档引用
+Skill 生成 .excalidraw → excalidraw-brute-export-cli 导出 SVG/PNG → Vision MCP 验证 → 文档引用
 ```
 
 存放位置：`docs/diagrams/<name>.excalidraw`
+
+**备选查看方式**（无需 CLI 安装）：
+- 在 [excalidraw.com](https://excalidraw.com) 拖放文件打开
+- VS Code Excalidraw 插件直接打开
 
 ## 生成 Workflow
 
@@ -148,6 +167,6 @@ white_ratio = (arr.mean(axis=2) > 250).mean()
 
 ## ChangeLogs
 
-- [2026-04-22 — Excalidraw CLI 导出能力：新增 @excalidraw/cli 命令参考（安装/推荐参数/批量导出），Excalidraw 完整工具链，输出列更新为 SVG/PNG]
+- [2026-04-22] 修正：`@excalidraw/cli` 不存在（npm 404），替换为 `excalidraw-brute-export-cli`（v0.4.0，Playwright+Firefox headless），参数更新为真实可用参数（-i/-o/--format/--background/--scale）
 - [2026-04-22 — 三工具分工表：新增 Excalidraw（手绘/协作/概念图），更新选择规则]
 - [2026-04-15 16:30:00] Initial: 生成规则、Mermaid 分工、质量验证三步流程、风格选择参考
