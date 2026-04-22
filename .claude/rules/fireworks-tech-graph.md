@@ -10,7 +10,7 @@
 |------|------|---------|------|---------|
 | Mermaid (`mmdc`) | 文档内联图表、快速流程图 | `.mmd` → `.png` | 静态 PNG | Vision MCP 检查文字渲染 |
 | fireworks-tech-graph | 出版级 SVG 架构图（7 风格 × 14 类型） | `.svg` → `.png` | 静态 PNG | Vision MCP + OCR 交叉验证 |
-| Excalidraw | 手绘风格可编辑图、协作白板、概念图 | `.excalidraw` JSON | 可编辑文件 | 在 Excalidraw 网页/VS Code 中打开验证 |
+| Excalidraw | 手绘风格可编辑图、协作白板、概念图 | `.excalidraw` → SVG/PNG | 静态 PNG | Vision MCP 直接分析导出 PNG |
 
 **选择规则**：
 - 文档内联图表、流程图、ER 图 → **Mermaid**（直接嵌入 markdown，mmdc 渲染 PNG）
@@ -18,11 +18,33 @@
 - 手绘风格、可编辑协作图、概念图、白板草图 → **Excalidraw**（输出 `.excalidraw` 文件）
 - 学习/教学场景的概念图 → **Excalidraw**（sigma skill 内置支持）
 
-**Excalidraw 注意事项**：
-- 输出是 `.excalidraw` JSON，不是直接可用的 PNG
-- 需在 [excalidraw.com](https://excalidraw.com) 或 VS Code Excalidraw 插件中打开
-- 如需 PNG，在 Excalidraw 中 Export → PNG
-- 存放位置：`docs/diagrams/<name>.excalidraw`
+**Excalidraw 导出（`@excalidraw/cli` 官方工具）**：
+
+```bash
+# 安装（只需一次）
+npm install -g @excalidraw/cli
+
+# 推荐：透明背景 + 高清 + 边距
+excalidraw diagram.excalidraw -o diagram.svg --padding 15 --background transparent --scale 2
+
+# 批量导出
+for f in *.excalidraw; do excalidraw "$f" -o "${f%.excalidraw}.svg" --padding 15 --background transparent; done
+```
+
+| 参数 | 作用 |
+|------|------|
+| `-o 文件名` | 输出路径（支持 .svg / .png） |
+| `--padding N` | 导出边距（推荐 15） |
+| `--background transparent` | 透明背景 |
+| `--scale 2` | 2x 高清 |
+| `--all-sheets` | 所有画板 |
+
+**Excalidraw 完整工具链**：
+```
+Skill 生成 .excalidraw → @excalidraw/cli 导出 SVG/PNG → Vision MCP 验证 → 文档引用
+```
+
+存放位置：`docs/diagrams/<name>.excalidraw`
 
 ## 生成 Workflow
 
@@ -126,5 +148,6 @@ white_ratio = (arr.mean(axis=2) > 250).mean()
 
 ## ChangeLogs
 
+- [2026-04-22 — Excalidraw CLI 导出能力：新增 @excalidraw/cli 命令参考（安装/推荐参数/批量导出），Excalidraw 完整工具链，输出列更新为 SVG/PNG]
 - [2026-04-22 — 三工具分工表：新增 Excalidraw（手绘/协作/概念图），更新选择规则]
 - [2026-04-15 16:30:00] Initial: 生成规则、Mermaid 分工、质量验证三步流程、风格选择参考

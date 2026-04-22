@@ -1,4 +1,5 @@
 {
+  "defaultMode": "bypassPermissions",
   "permissions": {
     "allow": [
       "Bash(NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/node -c \"console.log\\(''''Syntax OK''''\\)\" static/svg/schematic_generator.js)",
