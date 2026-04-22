@@ -52,6 +52,31 @@ free_ratio = freelist * page_size / file_size
 # >30% 空间可回收时建议 VACUUM
 ```
 
+## WAL Checkpoint 假阳性
+
+**问题**：WAL 文件增长到数百 MB 且 checkpoint 被活跃读者阻塞时，SQLite 报 `database or disk is full`，即使磁盘空间充足。
+
+**防护**：长时间运行的 WAL 模式服务必须添加定期 checkpoint 后台线程：
+
+```python
+import threading, time
+
+def start_wal_checkpoint_scheduler(db_path, interval=1800):
+    def checkpoint_loop():
+        while True:
+            time.sleep(interval)
+            try:
+                conn = sqlite3.connect(db_path, timeout=10)
+                conn.execute('PRAGMA wal_checkpoint(PASSIVE)')
+                conn.close()
+            except Exception:
+                pass
+    t = threading.Thread(target=checkpoint_loop, daemon=True)
+    t.start()
+```
+
+**PASSIVE vs TRUNCATE**：`PASSIVE` 不阻塞读者，适合后台定期执行。`TRUNCATE` 更彻底但需要无活跃读者。
+
 ## 级联重复防护
 
 **问题**：项目复制功能不检查同名设备 → 每次复制新增一套设备 → 级联产生 `device_params` + `sensor_data` 重复。
@@ -122,5 +147,6 @@ PARAM_RANGES = {
 
 ## ChangeLogs
 
+- [2026-04-22 14:49:00] 新增 WAL Checkpoint 假阳性防护模式（来自 04-21 日志 Insight）
 - [2026-04-16 11:52:00] 补充：sensor_data 单行约束、三写模型、PARAM_RANGES 默认陷阱（来自 04-07~04-08 日志抽象）
 - [2026-04-16 11:15:00] Initial: SQLite 去重模式、VACUUM 流程、级联重复防护、GROUP BY 陷阱
