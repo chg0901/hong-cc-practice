@@ -89,7 +89,7 @@ bash scripts/sync_claude_config.sh --push
 
 ### 项目自建 Skills（`.claude/skills/`，纳入 Git 同步）
 
-graphify-workflow, interaction-check, visual-check, manual-review, long-screenshot
+graphify-workflow, interaction-check, visual-check, manual-review, long-screenshot, doc-trim
 
 ### 第三方 Skills（git clone/npm 安装，不同步到 GitHub）
 

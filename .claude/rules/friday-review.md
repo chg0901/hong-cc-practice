@@ -66,6 +66,7 @@ Step 8: Commit + Push + Sync
 |------|----------|----------|
 | `daily-review.md` | 每日待办审查 | friday-review 管知识抽象，daily-review 管任务执行 |
 | `config-review.md` | 修改后检查 | friday-review 可能触发 config-review 的去重检查 |
+| `context-hygiene.md` | 上下文卫生 | friday-review 管知识抽象（insight→rule），context-hygiene 管体积控制（裁剪膨胀） |
 | `todo-tracking.md` | 待办格式 | friday-review 的产出项（如"下次补 rule"）可进入待办 |
 | `work-summary-rules.md` | 文档格式 | friday-review 的报告写入 work_summary |
 
