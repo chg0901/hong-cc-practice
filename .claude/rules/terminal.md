@@ -72,6 +72,8 @@ D:\Proj\energy\start_influxdb.bat
 2. **NO_PROXY 和测试命令**：see [proxy-rules.md](proxy-rules.md)
 3. **启动脚本说明**：告知用户哪个脚本在哪种终端运行，不直接执行 `.ps1`
 4. **`conda activate`** 在 bash 中使用 `&&`，在 PowerShell 中使用 `;`
+5. **服务重启必须使用 restart_services.ps1**：当需要重启后端服务（如数据库变更、代码更新后）时，告知用户在 PowerShell（管理员）中运行 `.\restart_services.ps1`。脚本包含 SQLite 锁检查、WAL Checkpoint、健康验证等防护步骤，比手动停启更安全。加 `-SkipSqliteCheck` 跳过 SQLite 检查阶段（如仅改前端代码时）
+6. **Claude Code 自动调用 restart_services.ps1**：经过测试，bash 环境可以通过 `powershell.exe -ExecutionPolicy Bypass -Command "& 'D:\Proj\energy\restart_services.ps1'"` 直接调用。用户确认后可自动执行，无需手动打开 PowerShell。加 `-SkipSqliteCheck` 跳过 SQLite 阶段（仅前端变更时）
 
 ---
 
@@ -81,6 +83,8 @@ D:\Proj\energy\start_influxdb.bat
 |------|----------|----------|------|
 | 运行 Claude Code 命令 | bash (Git Bash) | 普通用户 | `NO_PROXY=... python test.py` |
 | 启动 Flask 后端 | bash 或 PowerShell | 普通用户 | `python smart_energy_platform.py` |
+| **重启后端服务（推荐）** | **PowerShell（管理员）** | **管理员** | `.\restart_services.ps1` |
+| 重启（跳过 SQLite 检查） | PowerShell（管理员） | **管理员** | `.\restart_services.ps1 -SkipSqliteCheck` |
 | 启动 InfluxDB | 任意（双击 .bat） | 普通用户 | `start_influxdb.bat` |
 | 启动 MariaDB | PowerShell（管理员） | **管理员** | `& "...mysqld.exe" --defaults-file=...` |
 | 一键启动全服务 | PowerShell（管理员） | **管理员** | `.\start_project.ps1` |
@@ -206,5 +210,6 @@ PowerShell 对引号的处理与 bash/cmd 完全不同，是 `.ps1` 脚本最大
 
 ### ChangeLogs
 
+- [2026-04-25] 新增 Claude Code 自动调用 restart_services.ps1 规则（bash→PowerShell 桥接验证通过）
 - [2026-04-25] 新增 Here-String 规则（Section 3）+ 引号陷阱速查表（Section 4），编号 3→5
 - [2026-04-25] 初始：UTF-8 编码规则（禁止中文、临时 .py 文件模式、验证命令）
