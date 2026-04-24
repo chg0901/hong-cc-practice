@@ -86,3 +86,125 @@ D:\Proj\energy\start_influxdb.bat
 | 一键启动全服务 | PowerShell（管理员） | **管理员** | `.\start_project.ps1` |
 | 数据迁移 | PowerShell（管理员） | **管理员** | `.\scripts\migrate_influxdb_data.ps1` |
 | 运行 Python 测试 | bash (Git Bash) | 普通用户 | See [proxy-rules.md](proxy-rules.md) |
+
+## PowerShell 编码规则（mandatory）
+
+PowerShell 脚本（`.ps1`）**必须遵守以下 UTF-8 编码规则**：
+
+### 1. 禁止在 `.ps1` 中使用中文字符
+
+PowerShell 文件编码不可靠（BOM vs 无 BOM、ANSI vs UTF-8），中文在不同终端/系统可能乱码。所有 `.ps1` 文件中的字符串、注释、Write-Host 输出**只使用 ASCII 英文**。
+
+- 用 `[OK]` 不用 `[成功]`
+- 用 `[WARN]` 不用 `[警告]`
+- 用 `[FAIL]` 不用 `[失败]`
+- 用 `Write-Host "Starting Flask..."` 不用 `Write-Host "启动 Flask..."`
+
+### 2. 在 PowerShell 中执行 Python 多行代码的推荐方式
+
+**问题**：PowerShell 传 `-c` 参数时会剥除双引号，导致 Python 语法错误（`r"path"` 变成 `rpath`）。
+
+**推荐方案：临时 .py 文件 + `sys.argv` 传参**
+
+```powershell
+# 1. Helper function: write Python to temp file, exec with arg
+function Invoke-SqlitePython($pyScript) {
+    $tmpFile = Join-Path $env:TEMP "energy_sqlite_$(Get-Random).py"
+    try {
+        [System.IO.File]::WriteAllText($tmpFile, $pyScript, (New-Object System.Text.UTF8Encoding $false))
+        $output = & $PYTHON_EXE $tmpFile $DB_PATH 2>&1
+        return "$output"
+    } finally {
+        Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue
+    }
+}
+
+# 2. Python scripts as single-quoted here-strings (@'...'@) at SCRIPT TOP LEVEL
+#    Closing '@ MUST be at column 0 (no indentation). Does NOT expand $vars.
+$PY_CHECK_INTEGRITY = @'
+import sqlite3, sys
+db = sys.argv[1]
+conn = sqlite3.connect(db, timeout=5)
+r = conn.execute('PRAGMA integrity_check').fetchone()[0]
+print(f'OK|{r}')
+conn.close()
+'@
+
+# 3. Call from functions
+function Test-SqliteHealth {
+    $result = Invoke-SqlitePython $PY_CHECK_INTEGRITY
+    if ($LASTEXITCODE -eq 0 -and $result -match "^OK\|") { ... }
+}
+```
+
+**Why this works**:
+- `@'...'@` (single-quoted here-string) doesn't expand PowerShell variables — no `$` conflicts
+- Python code is written to temp file as-is, no quoting mangling
+- DB path passed via `sys.argv[1]`, avoiding all PowerShell string escaping issues
+- Temp file auto-cleaned in `finally` block
+
+**禁止的方案**：
+
+| Approach | Why it fails |
+|----------|-------------|
+| `& $PYTHON_EXE -c "code with quotes"` | PS strips double quotes from arguments |
+| `@"..."@` inside functions | `"@` must be at column 0, indented = parse error |
+| `& $PYTHON_EXE -c 'code with r"path"'` | Single quotes prevent PS expansion but r"path" loses quotes |
+
+### 3. Here-String 规则（mandatory）
+
+PowerShell 的 here-string（`@"..."@` 或 `@'...'@`）有一条**绝对规则**：
+
+> **闭合标记 `"@` 或 `'@` 必须在行首（column 0），前面不能有任何空格或缩进。**
+
+```
+# WRONG — indented closing "@ inside a function
+function Foo {
+    $script = @"
+        print('hello')
+        "@          # <- PS does NOT recognize this as here-string end!
+}
+
+# CORRECT — closing '@ at column 0 (script top level)
+$SCRIPT = @'
+print('hello')
+'@              # <- column 0, recognized correctly
+```
+
+| Here-string 类型 | 语法 | 变量展开 | 使用场景 |
+|-----------------|------|---------|---------|
+| 双引号 | `@"..."@` | **展开** `$var` | 需要 PS 变量替换时 |
+| 单引号 | `@'...'@` | **不展开** `$var` | 嵌入 Python/SQL 代码（推荐） |
+
+**本项目规则**：
+- 嵌入 Python/SQL 代码 → **始终用 `@'...'@`**（单引号），避免 `$` 被 PS 误展开
+- Here-string 变量定义在 **script top level**（不在 function 内部），自然满足 column 0 约束
+- 如果必须在函数内嵌入多行文本 → 用 .NET `[System.IO.File]::WriteAllText()` 写文件
+
+### 4. PowerShell 引号陷阱速查
+
+PowerShell 对引号的处理与 bash/cmd 完全不同，是 `.ps1` 脚本最大的坑：
+
+| 陷阱 | 症状 | 规避方法 |
+|------|------|---------|
+| 外部程序参数剥除双引号 | `python -c "r"path""` → Python 收到 `rpath` | 用临时 .py 文件 + `sys.argv` 传参 |
+| Here-string 闭合标记缩进 | `"@` 不被识别，Python 代码被 PS 解析 → parse error | 闭合标记放 column 0，变量放 script top level |
+| `@'...'@` vs `@"..."@` | `@"..."@` 展开 `$var`，嵌入 Python 代码时 `$` 被误展开 | Python/SQL 代码始终用 `@'...'@` |
+| 中文字符编码不一致 | BOM vs 无 BOM、ANSI vs UTF-8 乱码 | `.ps1` 文件只用 ASCII 英文 |
+| PowerShell `&&` 仅 7+ 有效 | PS 5.x 报错 `未识别 '&&'` | 用 `;` 分隔命令 |
+
+### 5. 验证命令
+
+每次修改 `.ps1` 文件后，**必须**运行语法验证：
+
+```powershell
+# PowerShell syntax validation (no output = OK)
+[System.Management.Automation.Language.Parser]::ParseFile('path\to\script.ps1', [ref]$null, [ref]$null)
+```
+
+无错误输出 = 语法正确。
+
+### ChangeLogs
+
+- [2026-04-25] 新增 Here-String 规则（Section 3）+ 引号陷阱速查表（Section 4），编号 3→5
+- [2026-04-25] 初始：UTF-8 编码规则（禁止中文、临时 .py 文件模式、验证命令）
