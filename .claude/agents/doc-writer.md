@@ -43,6 +43,43 @@ At minimum:
 3. **docs/changelog.md** -- full changelog entry
 4. **`.claude/rules/api-endpoints.md`** -- if new/modified API endpoints
 5. **README.md** -- if significant feature or milestone
+6. **Architecture Decision Records** (`docs/adr/NNNN-<topic>.md`) -- when implementation involves architectural choices
+7. **Change Impact Report** -- for major changes affecting multiple modules
+
+### ADR 模板（来自 BMAD Tech Writer）
+
+当实现涉及架构选择时，生成 ADR 文件到 `docs/adr/` 目录：
+
+```markdown
+# ADR-NNNN: <决策标题>
+
+## Status
+Proposed | Accepted | Deprecated | Superseded by ADR-XXXX
+
+## Context
+为什么需要做这个决策？背景和约束条件。
+
+## Decision
+我们选择了什么方案？
+
+## Consequences
+选择此方案的后果（正面和负面）。
+
+## Alternatives Considered
+考虑过的备选方案及否决原因。
+```
+
+### 变更影响文档模板
+
+重大变更（影响 >3 模块）时，在工作日志中新增影响分析报告：
+
+```markdown
+### 变更影响分析
+
+| 受影响模块 | 变更类型 | 影响描述 | 需要联动更新 |
+|-----------|----------|----------|-------------|
+| module_a | API 签名变更 | 新增参数 company_id | 是 → module_b, module_c |
+```
 
 ## Instructions
 

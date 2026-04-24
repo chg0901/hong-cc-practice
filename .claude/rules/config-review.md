@@ -120,6 +120,7 @@ bash scripts/sync_claude_config.sh --push
 ## ChangeLogs
 
 - [2026-04-22] 新增 excalidraw-diagram-generator 到排除清单（第三方安装，5 个）
+- [2026-04-26] 更新同步范围：rules 35→37（+cross-model-workflow.md +goal-backward.md），skills 自建 12→14（+ralph +prd）
 - [2026-04-26] 更新同步范围：rules 32→35（+deviation-handling.md +boris-cherny-tips.md），skills 自建 11→12（+spike）
 - [2026-04-22] 更新同步范围：rules 30→32（+context-hygiene.md +github-mcp-workflow.md），skills 8→9 自建（+doc-trim）
 - [2026-04-20 13:35:00] 更新同步范围：rules 28→30（+secrets.md +context-management.md），新增 baidu-search 到排除清单

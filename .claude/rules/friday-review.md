@@ -8,6 +8,7 @@
 
 ```
 Step 1: 读取本周所有 docs/work_summary_YYYYMMDD.md
+Step 1.5: Continuous Learning — 三级抽象分类
 Step 2: 提取 ★ Insight、踩坑、解决方案、可复用模式
 Step 3: 对比现有 .claude/rules/ 和 memory/ 的覆盖度
 Step 4: 将未覆盖的模式抽象为 Rules 或 Memory
@@ -16,6 +17,26 @@ Step 6: 更新 subagents.md（L2 Rules 计数）
 Step 7: 更新 MEMORY.md 索引
 Step 8: Commit + Push + Sync
 ```
+
+### Step 1.5: Continuous Learning 三级抽象
+
+来自 ECC Continuous Learning v2.1 概念。对本周所有 Insight 按重复频率分级：
+
+| 级别 | 名称 | 判定条件 | 处理方式 |
+|------|------|----------|----------|
+| L1 | Instinct（观察） | 仅出现 1 次 | 保留在 work_summary，不抽象 |
+| L2 | Pattern（模式） | 出现 2-3 次 | 标记为"下次关注"，若再出现则抽象 |
+| L3 | Rule/Memory（抽象） | 出现 3+ 次或高价值 | 正式提炼为 Rule 或 Memory 文件 |
+
+**判断标准**：
+- 同类错误/踩坑出现 3+ 次 → P1 Rule（操作规范）
+- 用户纠正过 2+ 次的偏好 → P2 Memory（feedback）
+- 项目特有的经验但不够 Rule 级别 → P3 Memory（reference）
+
+**Project-scoped Knowledge**：
+- 项目特定知识（SQLite 模式、Flask 陷阱）→ memory/ 或 rules/
+- 通用最佳实践（Git 工作流、测试策略）→ rules/
+- 外部工具使用经验 → memory/（reference type）
 
 ## 抽象优先级
 
@@ -95,5 +116,6 @@ Step 8: Commit + Push + Sync
 
 ## ChangeLogs
 
+- [2026-04-26] 新增 Step 1.5: Continuous Learning 三级抽象（Instinct→Pattern→Rule）、Project-scoped Knowledge 概念（来自 ECC v2.1）
 - [2026-04-16 12:02:00] 更新首次执行记录：第二轮 04-03~04-08 日志补充，覆盖度统计
 - [2026-04-16 11:15:00] Initial: 每周五自进化规则 + 首次执行记录

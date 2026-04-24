@@ -92,6 +92,33 @@ git branch -d YYYY-MM-DD
 - **如果会话中已经在 main 上做了提交**（如本会话），跳过分支创建，直接在 main 上继续工作，session end 时直接 push
 - After merge, always delete the day branch locally
 
+## Pre-commit Strategic Review（战略级审查）
+
+**来自 gstack plan-ceo-review**。在 Task-Batch Commit Checkpoint 的 commit 步骤前，执行四维度审查：
+
+| 维度 | 检查问题 | 与 code-review 的区别 |
+|------|----------|---------------------|
+| **Scope** | 本次变更是否超出原定任务范围？ | code-review 检查代码质量，CEO Review 检查方向 |
+| **Strategy** | 方案选择是否合理？有无更优方案？ | code-review 检查实现细节，CEO Review 检查方案 |
+| **Impact** | 变更是否影响其他模块？需要联动更新？ | code-review 检查单文件，CEO Review 检查跨模块影响 |
+| **Risk** | 是否有潜在的回滚风险？数据丢失可能？ | code-review 检查 bug，CEO Review 检查业务风险 |
+
+**触发条件**：每次 Task-Batch Commit Checkpoint 的 commit 前自动执行。
+
+**与 code-review-expert 的关系**：CEO Review 管方向（"做不做"），Code Review 管实现（"怎么做"）。两者互补，不替代。
+
+**输出格式**（在 work_summary 小结中记录）：
+
+```markdown
+### 战略审查
+| 维度 | 结果 | 说明 |
+|------|------|------|
+| Scope | ✅ 范围内 | 变更均属于原定任务 |
+| Strategy | ✅ 合理 | 选择了方案 B，理由是... |
+| Impact | ⚠️ 需联动 | module_c 需要同步更新 |
+| Risk | ✅ 低风险 | 向后兼容，无数据丢失风险 |
+```
+
 ## Function/Code Deletion Rules
 
 ### 删除前检查清单

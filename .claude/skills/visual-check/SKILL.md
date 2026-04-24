@@ -102,6 +102,42 @@ Record in work summary:
 | Chinese rendering | PASS/FAIL | Detail |
 ```
 
+### 7. Structured Visual Verdict（来自 OMC visual-verdict）
+
+每次视觉检查后，输出结构化 JSON 便于后续自动化对比和回归检测：
+
+```json
+{
+  "page": "cooling-dashboard",
+  "timestamp": "2026-04-26T10:00",
+  "checks": [
+    {"item": "font_consistency", "status": "PASS", "detail": "All cards use 11px sans-serif"},
+    {"item": "icon_rendering", "status": "FAIL", "detail": "chiller icon missing at row 3", "severity": "P1"},
+    {"item": "layout_overflow", "status": "PASS", "detail": "No text overflow beyond card borders"},
+    {"item": "chinese_rendering", "status": "PASS", "detail": "All CJK characters rendered correctly"},
+    {"item": "color_consistency", "status": "PASS", "detail": "Status colors match design tokens"},
+    {"item": "spacing_alignment", "status": "PASS", "detail": "Cards evenly spaced, no overlap"}
+  ],
+  "summary": {"pass": 5, "fail": 1, "total": 6},
+  "screenshots": ["test_screenshots/cooling_dash_20260426.png"]
+}
+```
+
+**字段说明**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `page` | string | 页面标识（如 `cooling-dashboard`, `home`, `3d-scene`） |
+| `timestamp` | ISO 8601 | 检查时间 |
+| `checks[].item` | string | 检查项名称（snake_case） |
+| `checks[].status` | PASS/FAIL | 检查结果 |
+| `checks[].detail` | string | 具体描述 |
+| `checks[].severity` | P0-P3 | 仅 FAIL 时需要，P0=阻断，P1=重要，P2=一般，P3=建议 |
+| `summary` | object | 统计：pass/fail/total |
+| `screenshots` | array | 关联的截图文件路径 |
+
+**与 ZAI ui_diff_check 配合**：使用 `ui_diff_check` 工具对比基线截图和当前截图时，将差异结果合并到此 JSON 格式中。
+
 ### 7. Mermaid Visual Quality Check (when .mmd files are modified)
 
 After rendering any mermaid PNG, MUST verify quality:
