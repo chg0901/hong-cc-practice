@@ -81,6 +81,7 @@ NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe test_codes/test_x
 | `test_codes/test_device_query_dedup.py` | Device query dedup: parameter API (G1, 6), device list (G2, 5), database integrity (G3, 5), frontend contract (G4, 5), query/chart/export (G5, 5); 26 tests total | `python test_codes/test_device_query_dedup.py` |
 | `test_codes/test_schematic_layout.py` | Schematic layout CRUD (G1-G7, 30 tests): create/read/update/delete, duplicate, template system, soft delete, edge cases, large data (1000 devices), save/load cycle (G6), template application (G7) | `python test_codes/test_schematic_layout.py` |
 | `test_codes/test_document_management.py` | Document management: config API (G1, 4), system types (G2, 4), upload/list/rename/view CRUD (G3, 6), permission checks (G4, 4), cleanup (G5, 2); 20 tests total | `python test_codes/test_document_management.py` |
+| `test_codes/test_company_id_migration.py` | company_id migration: companies table structure (G1, 6), company_id columns (G2, 8), company_id filtering (G3, 5), login company_id (G4, 3), API backward compatibility (G5, 3); 25 tests total | `python test_codes/test_company_id_migration.py` |
 
 ## Visual UI Testing (Playwright + Vision MCP)
 

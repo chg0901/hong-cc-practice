@@ -135,6 +135,101 @@ PARAM_RANGES = {
 - `device_params` 表是模拟器加载的前提：设备缺少条目会被跳过
 - 新增设备类型 → 先插入 `device_params` → 再加 `PARAM_RANGES`
 
+## 增量迁移模式（安全三步走）
+
+SQLite 不支持 `ALTER TABLE DROP/ALTER COLUMN`，结构变更必须用增量模式：
+
+```python
+# Step 1: 检查列是否存在
+cols = [row[1] for row in c.execute(f"PRAGMA table_info({table})").fetchall()]
+if 'new_column' not in cols:
+    c.execute(f"ALTER TABLE {table} ADD COLUMN new_column TYPE")
+
+# Step 2: 回填仅未迁移行（幂等）
+c.execute(f"UPDATE {table} SET new_column = <expr> WHERE new_column IS NULL")
+
+# Step 3: INSERT OR IGNORE 防止重复
+c.execute("INSERT OR IGNORE INTO new_ref_table (name) VALUES (?)", (value,))
+```
+
+**要点**：
+- `PRAGMA table_info` 检查列存在性 → 重启不报错
+- `WHERE new_column IS NULL` → 仅回填未迁移行，幂等安全
+- `INSERT OR IGNORE` → 参照表不重复
+- **保留旧列**：双列策略（旧列显示 + 新列过滤），零停机
+- 测试残留数据（如 `_nonexistent_`）自然不会被回填，company_id 保持 NULL → 自动标识
+
+## 查询优化反模式
+
+### 窗口函数陷阱（ROW_NUMBER() OVER）
+
+**问题**：`ROW_NUMBER() OVER (PARTITION BY col ORDER BY other_col DESC)` 看起来优雅（每组取一条），但在大表上 SQLite 必须先物化全量结果再排序编号，即使只需要 `rn=1`。
+
+**案例**：14M 行 `sensor_data` 表的窗口函数查询耗时 **204.8 秒**。
+
+**替代方案**：N 次索引查找
+
+```python
+# 旧：全表窗口函数 — 204.8s
+SELECT * FROM (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY device_id ORDER BY collect_time DESC) as rn
+    FROM sensor_data
+) WHERE rn = 1
+
+# 新：逐设备取最新 — 0.011s（18600x 提速）
+for device_id in device_ids:
+    c.execute('SELECT value, collect_time FROM sensor_data '
+              'WHERE device_id=? ORDER BY collect_time DESC LIMIT 1', (device_id,))
+```
+
+**适用条件**：
+- **N < 100**：设备/分组数量少于 100 时，N 次索引查找远快于一次全表窗口函数
+- **必须有复合索引**：`CREATE INDEX idx ON table(partition_col, order_col DESC)`，否则每次查找仍是全表扫描
+- **原理**：`ORDER BY col DESC LIMIT 1` + 复合索引 = B-tree 最右叶子节点 O(log N) 定位
+
+### 其他反模式速查
+
+| 反模式 | 症状 | 修复方案 |
+|--------|------|----------|
+| `OR col IS NULL` | 全表扫描、锁等待 | `INNER JOIN` 消除 NULL |
+| `WHERE company=?` 中文比较 | 编码差异导致隔离失效 | 数字外键 `WHERE company_id=?` |
+| `SELECT *` + `row[N]` | Schema 变更后取错列 | 显式列名 |
+| 无索引的 ORDER BY | 全表排序 | 覆盖索引 `(where_col, order_col DESC)` |
+
+### 前端 AJAX 并行化（配合后端优化）
+
+当后端查询已优化但仍需调用多个独立 API 时，前端串行嵌套 AJAX 会叠加延迟。
+
+**反模式**：串行嵌套（总延迟 = T1 + T2 + ...）
+
+```javascript
+// 旧：串行嵌套，延迟叠加
+$.ajax('/api/weather/...', success: function() {
+    $.ajax('/api/projects/.../latest-data', success: function() {
+        updateUI();
+    });
+});
+```
+
+**正确模式**：`$.when()` 并行（总延迟 = max(T1, T2)）
+
+```javascript
+// 新：并行，延迟取最大值
+$.when(
+    $.ajax({ url: '/api/weather/data/latest', data: { project_id } }),
+    $.ajax({ url: `/api/projects/${id}/latest-data` })
+).done(function(weatherRes, sensorRes) {
+    updateEnvironmentStatsFromWeather(project, weatherRes[0].data, sensorRes[0].data);
+}).fail(function() {
+    updateEnvironmentStatsFallback(project);
+});
+```
+
+**要点**：
+- 两个 API 之间无依赖时才可并行，否则仍需串行
+- `.done()` 回调参数是 `[data, status, jqXHR]` 的数组套数组，用 `res[0].data` 取数据
+- 添加 `timeout: 10000` 防止单个慢请求拖垮整个页面
+
 ## 维护操作记录
 
 | 操作 | 记录内容 |
@@ -147,6 +242,7 @@ PARAM_RANGES = {
 
 ## ChangeLogs
 
+- [2026-04-25 14:10:00] 新增增量迁移模式 + 查询优化反模式（来自 company_id 迁移 + latest-data 查询优化经验）
 - [2026-04-22 14:49:00] 新增 WAL Checkpoint 假阳性防护模式（来自 04-21 日志 Insight）
 - [2026-04-16 11:52:00] 补充：sensor_data 单行约束、三写模型、PARAM_RANGES 默认陷阱（来自 04-07~04-08 日志抽象）
 - [2026-04-16 11:15:00] Initial: SQLite 去重模式、VACUUM 流程、级联重复防护、GROUP BY 陷阱

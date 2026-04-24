@@ -111,6 +111,59 @@ Claude Code 输入布局（不变 → 变化）：
 - 需要轻量模型时，用 subagent 而非切主模型
 - 便宜模型（如 GLM/Kimi）混用时，/exit 切换配置后 --resume 可以复用上下文
 
+## Context Decay Prevention — 上下文腐烂防护
+
+### 什么是上下文腐烂
+
+上下文腐烂（Context Decay）是指随着对话轮次增加，Claude 的输出质量逐渐下降的现象。原因：
+- 早期对话中的错误方案、废弃代码、误导性信息残留在上下文中
+- 上下文窗口被无关文件内容填满，有效信息的密度降低
+- 上下文越长，Claude 越容易"遗忘"早期的关键约束
+
+### 检测信号
+
+| 信号 | 说明 |
+|------|------|
+| Claude 重复已纠正过的错误 | 上下文中早期错误信息仍占权重 |
+| 输出变泛泛/缺乏针对性 | 有效信息被噪音稀释 |
+| 开始忽略 CLAUDE.md 中的规则 | 上下文过长，规则权重下降 |
+| 同样的修改需要 2-3 轮才对 | 上下文中有矛盾信息干扰 |
+
+### 应对策略
+
+| 场景 | 策略 | 命令 |
+|------|------|------|
+| 大范围重构（>10 文件） | 用 subagent 隔离，每个 subagent 只负责 3-5 文件 | `context: fork` skill 或 Agent tool |
+| 方案失败需要换方向 | summarize → rewind → 新 prompt | `/rewind` |
+| 阶段性完成 | 主动 compact，保留关键信息 | `/compact focus on 当前任务, drop 已完成部分` |
+| 读取大量无关文件后 | 立即 compact 或 rewind | `/compact` 或 `/rewind` |
+| 探索性实验 | 用 Spike Skill（subagent 隔离） | `/spike` |
+| 累积 3+ 失败尝试 | 果断 /clear 重开，把结论带入新会话 | `/clear` |
+
+### Subagent 隔离模式（推荐用于大重构）
+
+```
+主会话（Orchestrator）           子代理（Worker）
+┌──────────────────────┐    ┌──────────────────────┐
+│ 读 plan              │    │ 独立 200k context    │
+│ 分配任务块           │───→│ 执行 3-5 文件修改     │
+│ 收集结果             │←───│ 返回 diff + 验证结果  │
+│ 整合 + commit        │    │ 自动销毁             │
+└──────────────────────┘    └──────────────────────┘
+
+主会话上下文保持 30-40% 使用率
+子代理用完即弃，不污染主上下文
+```
+
+### 与 GSD Wave Execution 的对比
+
+| 维度 | 本项目策略 | GSD Wave Execution |
+|------|-----------|-------------------|
+| 隔离方式 | subagent + context:fork | 独立 executor 进程 |
+| 上下文管理 | 主会话 < 40% + 主动 compact | 每个 plan 用 fresh 200k |
+| 适用场景 | 中等规模（3-5 文件/任务） | 大规模（10+ 文件/phase） |
+| 工具 | superpowers + Agent tool | GSD planner + executor agents |
+
 ## CLAUDE.md 精简建议
 
 - 官方建议控制在 **200 行以内**
