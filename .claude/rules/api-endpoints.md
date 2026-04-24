@@ -84,6 +84,15 @@
 - `GET /api/regions` - Province/city/district address data
 - `GET/POST /api/system/settings` - Get/Update system settings
 
+## Document Management (项目资料管理)
+- `GET /api/documents/config` - Get storage config (upload_base, max_file_size)
+- `GET /api/documents/system-types/<project_id>` - Get available system folder types
+- `GET /api/documents/list/<project_id>` - List documents (?type= filter)
+- `POST /api/documents/upload` - Upload document (form: project_id, doc_type, description, system_type, file)
+- `POST /api/documents/rename` - Rename document (json: doc_id, new_name)
+- `DELETE /api/documents/delete/<doc_id>` - Delete document (admin only)
+- `GET /api/documents/view/<doc_id>` - View/preview document
+
 ## Device Query (系统运行监控 - 设备级数据查询)
 - `GET /api/device-query/companies` - Company list (multi-tenant filtered)
 - `GET /api/device-query/projects` - Project list (?company= filter)
