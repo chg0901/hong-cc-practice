@@ -102,7 +102,7 @@ bash scripts/sync_claude_config.sh --push
 | 包含 | 排除（原因） |
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
-| `rules/*.md`（35 个 rules） | `book2skills/`（第三方安装的 skills） |
+| `rules/*.md`（19 个项目 rules） | `book2skills/`（第三方安装的 skills） |
 | `skills/*/SKILL.md`（12 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | — | `baidu-search/`（第三方安装的 skills） |
@@ -119,6 +119,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-28] 规则重组：全局 rules 37→18（通用），项目 rules 37→19（项目专用），消除双重加载（节省 ~27,600 token/会话）；同步范围更新：rules 37→19 项目 rules
 - [2026-04-22] 新增 excalidraw-diagram-generator 到排除清单（第三方安装，5 个）
 - [2026-04-26] 更新同步范围：rules 35→37（+cross-model-workflow.md +goal-backward.md），skills 自建 12→14（+ralph +prd）
 - [2026-04-26] 更新同步范围：rules 32→35（+deviation-handling.md +boris-cherny-tips.md），skills 自建 11→12（+spike）
