@@ -103,7 +103,7 @@ bash scripts/sync_claude_config.sh --push
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
 | `rules/*.md`（19 个项目 rules） | `book2skills/`（第三方安装的 skills） |
-| `skills/*/SKILL.md`（12 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
+| `skills/*/SKILL.md`（14 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
 | — | `context-research/`（第三方安装的 skills） |
 | — | `baidu-search/`（第三方安装的 skills） |
 | — | `excalidraw-diagram-generator/`（第三方安装的 skills） |
