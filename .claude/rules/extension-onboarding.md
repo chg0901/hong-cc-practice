@@ -28,7 +28,7 @@
 | `.claude/rules/subagents.md` | L3 Skills 计数、Skills 全景图表、触发方式 |
 | `.claude/rules/config-review.md` | GitHub 同步范围（包含/排除清单）、skills 计数 |
 | `.claude/rules/mcp-servers.md` | 如涉及新 MCP server，更新可用服务器列表 |
-| `.claude/rules/search-workflow.md` | 如涉及搜索工具变更，更新工具目录和回退链 |
+| `~/.claude/rules/search-workflow.md` | 如涉及搜索工具变更，更新工具目录和回退链（全局 rule） |
 | `CLAUDE.md` | 如涉及新开发命令或测试流程，更新对应章节 |
 
 ### Step 3: 更新 Memory

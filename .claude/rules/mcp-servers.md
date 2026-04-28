@@ -1,300 +1,46 @@
 # MCP Server Usage Rules
 
-## Available MCP Servers (26 total) + 1 Skill-based Search + 1 GitHub MCP
+**Full server catalog (26+ servers), auth configs, per-server details**: [reference_mcp_catalog.md](memory/reference_mcp_catalog.md)
+**Task-to-MCP quick mapping**: [reference_mcp_servers.md](memory/reference_mcp_servers.md)
 
-### Custom Servers (.claude.json) — 7 servers
+## Tool Selection Rules
 
-| Server | Type | Status | Primary Use |
-|--------|------|--------|-------------|
-| MiniMax | stdio | connected | Vision analysis, web search |
-| ZAI | stdio | connected | Image analysis, OCR, UI diff, data viz |
-| 4_5v_mcp | HTTP | connected | Image analysis |
-| web-search-prime | HTTP (zhipu) | connected | Web search |
-| web-reader | HTTP (zhipu) | connected | URL to markdown |
-| zread | HTTP (zhipu) | connected | GitHub repo browser |
-| jina-mcp-server | HTTP (remote) | connected | Web read/search, arXiv, PDF, rerank, dedup (20 tools) |
+### Jina vs Search Tool Selection
 
-### Skill-based Servers — 1 server
+| Scenario | First Choice | Reason |
+|----------|-------------|--------|
+| Library/framework docs | `context7` | Most precise, no quota cost |
+| Chinese web search | `web-search-prime` | Chinese search optimization |
+| English tech content | `jina search_web` | Returns full content |
+| Academic papers | `jina search_arxiv` | Only tool supporting academic search |
+| PDF reading | `jina read_url` | Native PDF support |
+| GitHub repos | `zread` or `jina read_url` | zread is lighter |
+| SPA/JS rendered pages | `jina read_url` | Puppeteer rendering, good SPA support |
+| Login-required pages | `web-access` | Inherits Chrome login state |
+| Anti-scraping sites | `web-access` | CDP harder to detect |
+| Parallel browsing | `web-access` sub-agents | Each sub-agent opens own tab |
 
-| Server | Type | Status | Primary Use |
-|--------|------|--------|-------------|
-| web-access (eze-is) | CDP Proxy | connected | Real Chrome automation, login state, anti-scraping, parallel sub-agents |
+**Full search workflow spec**: `~/.claude/rules/search-workflow.md` (global rule: tool Tier 0-4, parallel combos, cross-validation, report template, fallback chain)
 
-### Plugin Servers (settings.json) — 8 servers
+### web-access vs Playwright
 
-| Server | Status | Auth | Primary Use |
-|--------|--------|------|-------------|
-| context7 | connected | None | Library documentation query |
-| playwright | connected | None | Browser automation, UI testing |
-| GitHub | configured | PAT in env | Repo management, issues, PRs |
-| Greptile | needs key | API Key | Cross-repo code search |
-| Serena | installed | None (needs NO_PROXY) | Code analysis agent |
-| Atlassian | needs OAuth | Browser OAuth | Jira/Confluence |
-| Supabase | needs OAuth | Browser OAuth | Database management |
-| Figma plugin | needs auth | Built-in | Design-to-code |
-
-### Built-in Servers (claude.ai) — 7 servers
-
-| Server | Status | Primary Use |
-|--------|--------|-------------|
-| Hugging Face | connected | ML models, datasets, papers |
-| Gamma | connected | AI presentations, documents |
-| Figma | connected | Design-to-code, screenshots |
-| Linear | connected | Project management, issues |
-| Gmail | connected | Email management |
-| Vercel | connected | Deployment, logs |
-| Mermaid Chart | partial | Diagram rendering (Puppeteer issue) |
-
-## Usage Guidelines
-
-### Image Analysis (use FIRST for visual verification)
-
-```
-MiniMax understand_image  → Full-page UI analysis, layout, icons
-ZAI extract_text          → OCR for Chinese/numbers verification
-ZAI ui_diff_check         → Regression comparison (baseline vs current)
-ZAI analyze_data_viz      → Chart/graph data correctness
-```
-
-### Web Search & Documentation
-
-```
-MiniMax web_search        → General web search (query param, not search_query)
-web-search-prime          → Zhipu web search (search_query param)
-web-reader webReader      → URL to markdown conversion
-context7 query-docs       → Library/framework documentation
-zread read_file           → GitHub repo file reader
-jina read_url             → URL to markdown (Puppeteer rendered, better for SPA/PDF)
-jina search_web           → Web search with full content (not just snippets)
-jina search_arxiv         → Academic paper search
-jina search_ssrn          → Social science paper search
-jina search_images        → Image search
-jina extract_pdf          → PDF figure/table/equation extraction
-```
-
-### Jina MCP Tool Usage Priority
-
-**日常开发（默认使用）**：
-- `read_url` — 读取网页/PDF 内容为 Markdown
-- `search_web` — 网络搜索（返回完整内容而非摘要）
-- `search_arxiv` — 学术论文搜索
-- `primer` — 获取当前时间/本地化信息
-- `guess_datetime_url` — 判断页面发布时间
-
-**并行操作（多查询场景）**：
-- `parallel_read_url` — 同时读取多个 URL
-- `parallel_search_web` — 同时执行多个搜索
-- `parallel_search_arxiv` / `parallel_search_ssrn` — 并行学术搜索
-
-**Rerank 工具（按需使用，仅用户明确要求时调用）**：
-- `sort_by_relevance` — 搜索结果按相关性重排
-- `deduplicate_strings` — 语义去重
-- `deduplicate_images` — 图片语义去重
-- `classify_text` — 文本分类
-
-> Rerank 工具消耗 Jina token 且用频较低。仅在用户要求深度研究、竞品分析、论文综述等场景下主动使用。
-
-### Jina vs 现有搜索工具选择
-
-| 场景 | 首选工具 | 原因 |
-|------|---------|------|
-| 库/框架文档 | `context7` | 最精确，无配额消耗 |
-| 中文网页搜索 | `web-search-prime` | 中文搜索优化 |
-| 英文技术内容 | `jina search_web` | 返回完整内容 |
-| 学术论文 | `jina search_arxiv` | 唯一支持学术搜索 |
-| PDF 读取 | `jina read_url` | 原生 PDF 支持 |
-| GitHub 仓库 | `zread` 或 `jina read_url` | zread 更轻量 |
-| SPA/JS 渲染页面 | `jina read_url` | Puppeteer 渲染，对 SPA 支持好 |
-| 需登录页面 | `web-access` | 继承 Chrome 登录状态 |
-| 反爬虫站点 | `web-access` | CDP 更难被检测 |
-| 并行浏览多页面 | `web-access` sub-agents | 子代理各自开 tab |
-
-**完整搜索工作流规范**: [search-workflow.md](search-workflow.md)（工具分级、并行策略、交叉验证、报告模板、失败回退链）
-
-### web-access (eze-is)
-
-Skill-based real browser automation via Chrome CDP Proxy.
-
-**安装**: `npx skills add eze-is/web-access`（已安装）
-**前置条件**: Chrome 启用 `chrome://inspect/#remote-debugging` → "Allow remote debugging"
-**API**: HTTP localhost:3456（`/new`, `/eval`, `/click`, `/screenshot`, `/scroll`, `/navigate`, `/close`）
-
-**核心能力**:
-- 继承用户 Chrome 的登录状态（cookies、sessions）
-- 可点击、滚动、填写表单、上传文件
-- 支持反爬虫站点（小红书、微信公众号、知乎等）
-- 支持并行子代理（每个子代理独立 tab）
-- 支持视频分析（seek + 截帧）
-
-**适用场景**: 需登录页面、反爬虫站点、复杂 JS 交互、并行浏览。简单 URL 读取优先使用 `jina read_url` 或 `web-reader`。
-
-### baidu-search (CLI Skill)
-
-百度千帆 AI Search，Python CLI 工具（非 MCP Server），位于 `~/.claude/skills/baidu-search/`。
-
-**安装**: 已安装（`~/.claude/skills/baidu-search/scripts/search.py`）
-**API Key**: 存储在 `scripts/config.json` + `.env`（`BAIDU_API_KEY`）
-
-**调用方式**:
-```bash
-# 网页搜索（默认）
-D:/miniconda3/envs/ene/python.exe ~/.claude/skills/baidu-search/scripts/search.py "关键词" --json
-
-# 时间过滤
-... search.py "关键词" --recency week   # week/month/semiyear/year
-
-# 百科/AI 模式
-... search.py "关键词" --api-type baike   # baike/miaodong_baike/ai_chat
-```
-
-**vs 现有中文搜索工具**:
-
-| 维度 | baidu-search | web-search-prime (Zhipu) | jina search_web |
-|------|-------------|-------------------------|-----------------|
-| 中文搜索质量 | 百度索引，最优 | 中等 | 弱 |
-| 时间过滤 | `--recency` week/month/year | `search_recency_filter` | 无 |
-| 配额 | 100 次/天（独立） | Shared pool | Free tier |
-| 返回内容 | 结构化 JSON（标题+摘要+URL+日期） | 摘要 | 完整内容 |
-
-**使用场景（仅以下情况首选）**:
-1. 中国政策/法规/补贴等中文本地化搜索
-2. 需要精确时间过滤的中文搜索（过去 7 天/1 月的新闻）
-3. 中文内容搜索时作为 web-search-prime 的替代
-
-**完整搜索工作流规范**: [search-workflow.md](search-workflow.md)（Tier 1.5 定位）
-
-### web-access vs Playwright 分工
-
-| 维度 | web-access (CDP) | Playwright (MCP Plugin) |
-|------|-----------------|------------------------|
-| **浏览器** | 用户日常 Chrome（非 headless） | 内置 Chromium（隔离环境） |
-| **登录状态** | 继承用户 Chrome cookies/sessions | 无登录状态，需手动登录 |
-| **反爬虫** | 更难被检测（真实 Chrome 指纹） | 可能被反爬虫检测 |
-| **截图质量** | 一般（CDP captureScreenshot） | 高（支持 fullPage、element、CSS scale） |
-| **DOM 操作** | 通过 CDP Runtime.evaluate（JS 注入） | 语义化 API（click/type/fill/snapshot） |
-| **并行能力** | 子代理各自开 tab，天然并行 | 单浏览器串行，需多 context |
-| **UI 测试** | 不适合（无断言框架） | 适合（snapshot + screenshot + Vision MCP） |
-| **速度** | 快（直连用户 Chrome） | 较快（本地 Chromium） |
-| **稳定性** | 依赖 Chrome CDP 端口开启 | 稳定（自带浏览器） |
-| **配置复杂度** | 需 Chrome `--remote-debugging-port` | 零配置（自动安装） |
-
-**决策规则**：
-
-| 需求 | 首选 | 理由 |
-|------|------|------|
-| 需登录的页面 | web-access | 继承 Chrome 登录态 |
-| 反爬虫站点 | web-access | 真实浏览器指纹 |
-| 并行浏览 3+ 页面 | web-access | 子代理天然并行 |
-| UI 自动化测试 | Playwright | snapshot + screenshot + 断言 |
-| 截图验证 | Playwright | fullPage + 高清 + element 精确 |
-| 表单填写/下拉选择 | Playwright | fill_form + select_option 语义化 |
-| 简单页面交互 | Playwright | 无需 Chrome 预配置 |
-| 已有 tab 操作 | web-access | 操作用户已打开的页面 |
-
-### GitHub MCP (github@claude-plugins-official)
-
-GitHub MCP Server 提供 26 个工具，涵盖仓库管理、Issue/PR 自动化、代码搜索。
-
-**配置状态**：已在 `~/.claude/settings.json` 的 `env.GITHUB_PERSONAL_ACCESS_TOKEN` 配置完成。
-
-**重要**：存在两个 GitHub MCP 版本：
-- `@modelcontextprotocol/server-github`（已归档，26 个工具，本项目使用）
-- `github/github-mcp-server`（GitHub 官方，活跃维护，支持 toolsets 按需启用）
-
-**核心工具速查**：
-
-| 工具 | 功能 |
-|------|------|
-| `get_file_contents` | 读取仓库文件/目录（任意分支） |
-| `search_code` | GitHub 代码搜索（language:/repo:/path: 语法）|
-| `search_repositories` | 搜索仓库（stars/语言/时间过滤）|
-| `create_issue` / `list_issues` / `update_issue` | Issue CRUD |
-| `create_pull_request` / `get_pull_request_files` | PR 创建和变更查看 |
-| `create_pull_request_review` | 提交 Code Review（APPROVE/REQUEST_CHANGES/COMMENT）|
-| `merge_pull_request` | 合并 PR |
-| `push_files` | 批量推送文件（单次 commit 多文件）|
-
-**适用场景**：仓库调研、Issue 批量管理、PR 审查、代码搜索。
-
-**详细工作流规范**：[github-mcp-workflow.md](github-mcp-workflow.md)
-
-**完整使用指南**：[docs/github_mcp_guide.md](../docs/github_mcp_guide.md)（含知乎格式文档）
-
-### Browser Automation
-
-```
-playwright browser_navigate   → Open URL
-playwright browser_snapshot   → DOM accessibility tree
-playwright browser_click      → Click element
-playwright browser_screenshot → Capture PNG
-```
-
-### Project Management
-
-```
-Linear list_issues/create_issue → Track bugs and features
-Gmail gmail_search/create_draft → Email communication
-```
-
-### Design & Presentation
-
-```
-Figma get_design_context → Design-to-code translation
-Gamma generate           → AI presentations
-Mermaid render           → Diagram rendering (use mmdc CLI as fallback)
-```
+| Need | First Choice | Reason |
+|------|-------------|--------|
+| Login-required page | web-access | Inherits Chrome login state |
+| Anti-scraping site | web-access | Real browser fingerprint |
+| Parallel browsing 3+ pages | web-access | Sub-agents naturally parallel |
+| UI automation testing | Playwright | snapshot + screenshot + assertions |
+| Screenshot verification | Playwright | fullPage + high-res + element precision |
+| Form fill / dropdown select | Playwright | fill_form + select_option semantic API |
+| Simple page interaction | Playwright | No Chrome pre-config needed |
 
 ## Proxy Bypass Rules
 
 For NO_PROXY patterns and environment variables, see [proxy-rules.md](proxy-rules.md).
 
-## Authentication Reference
-
-| Server | Auth Method | Where to Configure |
-|--------|------------|-------------------|
-| GitHub | PAT | `settings.json` → env → GITHUB_PERSONAL_ACCESS_TOKEN |
-| Greptile | API Key | `settings.json` → env → GREPTILE_API_KEY |
-| Atlassian | OAuth | Browser redirect (one-time) via `authenticate` tool |
-| Supabase | OAuth | Browser redirect (one-time) via `authenticate` tool |
-| MiniMax | API Key | `.claude.json` → mcpServers → MiniMax → env |
-| ZAI | API Key | `.claude.json` → mcpServers → zai-mcp-server → env |
-| Jina | API Key (optional) | `.claude.json` → mcpServers → jina-mcp-server → headers |
-
-## MiniMax Coding Plan MCP
-
-Package: `minimax-coding-plan-mcp` (GitHub: [MiniMax-AI/MiniMax-Coding-Plan-MCP](https://github.com/MiniMax-AI/MiniMax-Coding-Plan-MCP))
-
-| Tool | Param | Description |
-|------|-------|-------------|
-| `understand_image` | `image_source` + `prompt` | General image analysis (local file or URL) |
-| `web_search` | `query` | Web search returning organic results |
-
-API Host: `https://api.minimaxi.com` (China) / `https://api.minimax.io` (international). Key and host **must match region**.
-
-Docs: [platform.minimaxi.com/docs/guides/mcp-guide](https://platform.minimaxi.com/docs/guides/mcp-guide)
-
-## ZAI MCP (GLM-4V Vision)
-
-Package: `@z_ai/mcp-server` (NPM). Env: `Z_AI_API_KEY`, `Z_AI_MODE=ZHIPU`. Tools: 8 specialized vision tools (see Vision Tool Selection table above).
-| zhipu APIs | Bearer token | `.claude.json` → mcpServers → web-search-prime/reader/zread → headers |
-
-## Cache Locations (D Drive)
-
-All MCP-related caches consolidated at `D:\claude_code_mcp\`:
-
-| Cache | Env Var | Size | Used By |
-|-------|---------|------|---------|
-| npm-cache | npm config | 1.8G | npx (MiniMax, mermaid-local, zai) |
-| uv-cache | `UV_CACHE_DIR` | 1.7G | uvx (MiniMax) |
-| puppeteer-cache | `PUPPETEER_CACHE_DIR` | 909M | Puppeteer |
-| puppeteer-chrome | `PUPPETEER_EXECUTABLE_PATH` | 409M | mermaid-local MCP |
-| playwright | `PLAYWRIGHT_BROWSERS_PATH` | 31M | Playwright plugin |
-
-For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file-migration.md](file-migration.md).
-
 ## Zhipu MCP Usage Rules
 
-### Vision Tool Selection (zai-mcp-server — 8 tools)
+### Vision Tool Selection (zai-mcp-server -- 8 tools)
 
 | User Need | Tool | Key Parameters |
 |-----------|------|----------------|
@@ -314,27 +60,20 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 ### Search + Read Pipeline
 
 1. **Search first**: `web-search-prime` with `search_query` (max 70 chars)
-   - Chinese results: add `location=cn`
-   - Recent info: add `search_recency_filter=oneMonth`
-   - Specific site: add `search_domain_filter=docs.python.org`
-   - Detailed summary: add `content_size=high`
+   - Chinese results: add `location=cn`; Recent info: add `search_recency_filter=oneMonth`
+   - Specific site: add `search_domain_filter`; Detailed summary: add `content_size=high`
 
 2. **Read full page**: `webReader` with URL from search results
-   - Tech docs: `retain_images=false` (faster, cleaner)
-   - Design pages: `retain_images=true`
-   - Latest content: `no_cache=true`
-   - Follow links: `with_links_summary=true`
+   - Tech docs: `retain_images=false`; Design pages: `retain_images=true`
 
 3. **GitHub repos**: Use `zread` instead of search+reader
-   - `search_doc(repo_name, query)` → search issues/docs/commits
-   - `get_repo_structure(repo_name, dir_path)` → directory tree
-   - `read_file(repo_name, file_path)` → full file content
+   - `search_doc(repo_name, query)` / `get_repo_structure(repo_name, dir_path)` / `read_file(repo_name, file_path)`
 
 ### Quota Management
 
 - `web-search-prime` + `web-reader` share monthly quota (Lite 100 / Pro 1000 / Max 4000)
 - `zread` has independent quota (same tiers)
-- **Never call search in loops** — batch search once, cache results in context
+- **Never call search in loops** -- batch search once, cache results in context
 - Prefer `context7` for library docs (no quota cost, more precise)
 
 ### Search Tool Selection Decision
@@ -353,10 +92,8 @@ For env vars and migration rules, see [proxy-rules.md](proxy-rules.md) and [file
 
 ## ChangeLogs
 
-- [2026-04-20 13:25:00] Added baidu-search CLI skill (Tier 1.5): 百度千帆 AI Search, 100/day, 中文本地化搜索 + 时间过滤; updated title to "26 total + 1 Skill-based Search"
-- [2026-04-16 16:30:00] Added web-access (eze-is) skill-based server; updated total 25→26; added web-access section + search tool selection rows; added search-workflow.md pointer
-- [2026-04-15 16:20:00] Added jina-mcp-server (remote HTTP, 20 tools); updated custom servers 6→7; added Jina tool usage priority + rerank strategy + collaboration flow; MCP total 24→25
-- [2026-04-14 16:00:00] Added MiniMax Coding Plan MCP section (package, API host, tools, docs URL); clarified MiniMax vs ZAI separation; added `query` vs `search_query` param distinction
-- [2026-04-13 20:56:00] Deduplicated: NO_PROXY section replaced with pointer to proxy-rules.md, cache section updated with cross-references
-- [2026-04-13 — Added Zhipu MCP usage rules](changes/2026-04-13-zhipu)
+- [2026-04-28] Slim-down: extracted server catalog, per-server details, auth table, cache locations to reference_mcp_catalog.md; kept decision tables, selection rules, Zhipu usage rules; 363→~115 lines
+- [2026-04-20 13:25:00] Added baidu-search CLI skill (Tier 1.5)
+- [2026-04-16 16:30:00] Added web-access (eze-is); total 25→26
+- [2026-04-15 16:20:00] Added jina-mcp-server; MCP total 24→25
 - [2026-04-09 — Initial: 24 MCP servers catalog, usage guidelines, auth reference](changes/2026-04-09)

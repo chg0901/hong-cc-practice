@@ -59,29 +59,8 @@ NO_PROXY=127.0.0.1,localhost D:/miniconda3/envs/ene/python.exe test_codes/test_x
 
 ## Existing Test Files
 
-| File | Coverage | Run Command |
-|------|----------|-------------|
-| `test_codes/test_project_crud_and_soft_delete.py` | Project CRUD, libraries, soft-delete, weather pagination/conflict (53 tests) | `python test_codes/test_project_crud_and_soft_delete.py` |
-| `test_codes/test_weather_data.py` | Weather ingestion, seed data, file validation (13+6 tests) | `python test_codes/test_weather_data.py [--server]` |
-| `test_codes/test_api_response.py` | Basic API response checks | `python test_codes/test_api_response.py` |
-| `test_codes/test_weather_api.py` | Weather API endpoints | `python test_codes/test_weather_api.py` |
-| `test_codes/test_fault_handle.py` | Fault handling | `python test_codes/test_fault_handle.py` |
-| `test_codes/test_gas_and_pricing.py` | Gas consumption, heating/cooling season, TOU electricity, gas/water prices, regions (31 tests) | `python test_codes/test_gas_and_pricing.py` |
-| `test_codes/test_comprehensive_api.py` | Login, dashboard, cooling module, faults, permissions, settings, systems CRUD, agriculture, water-fertilizer, data export, electricity prices, map/carbon (46 tests) | `python test_codes/test_comprehensive_api.py` |
-| `test_codes/test_device_icons.py` | DeviceIconLibrary static analysis (G1), API device type validation (G2), page API contracts (G3); total 10 tests; G2/G3 require `--server` flag | `python test_codes/test_device_icons.py [--server]` |
-| `static/test_device_icons.html` | Browser-side JS unit tests for DeviceIconLibrary.getIconSvg(): T1–T8, 22 assertions (class loading, SVG structure, 28 types, status, fallback, size/label) | Open `http://127.0.0.1:5000/static/test_device_icons.html` |
-| `test_codes/test_control_logging.py` | Control log persistence, Chinese action names, fault logging, permission filter, DB schema (L1-L6, 16 tests) | `python test_codes/test_control_logging.py` |
-| `test_codes/test_device_management.py` | Paginated device logs (DM1, 6 tests), permission filtering with pagination (DM2, 3 tests), add-device-from-library flow (DM3, 5 tests); 14 tests total | `python test_codes/test_device_management.py` |
-| `test_codes/test_meter_reading.py` | Meter reading system: first reading, consecutive readings, gas/water/electricity isolation, legacy compat, update recalculation, multi-project isolation, filter by type, soft delete (MR1-MR9, 25 tests) | `python test_codes/test_meter_reading.py` |
-| `test_codes/test_device_library_expanded.py` | Expanded device library: template count, agriculture/cooling sensor+controller types, default_params validation, cumulative flag, industry filter (DL1-DL8, 69 tests) | `python test_codes/test_device_library_expanded.py` |
-| `test_codes/test_permissions_rbac.py` | RBAC permission system: login auth (P1, 7), user CRUD (P2, 10), admin protection (P3, 3), device control enforcement (P4, 8), control log role filtering (P5, 6), permission config CRUD (P6, 8), system settings (P7, 5), security gaps (P8, 5), edge cases (P9, 6); 58 tests total | `python test_codes/test_permissions_rbac.py` |
-| `test_codes/test_todo_verification.py` | Pending TODO verification: G1 meteorology chart data integrity (5 fields + base64), G2 control log pagination & Chinese action names, G3 water/electricity meter type isolation, G4 gas/water price CRUD, G5 device log page boundaries (size=1/20, last page, overflow), G6 cooling endpoint project filter; 38 tests total | `python test_codes/test_todo_verification.py` |
-| `test_codes/test_system_audit.py` | System audit regression: G1 classification fix (cooling no agriculture, agriculture has agriculture, temp sensors), G2 data dedup (system_library 6, devices 26), G3 meter reading smoke; G1-G3, 8 tests total | `python test_codes/test_system_audit.py` |
-| `test_codes/test_visual_svg_cards.py` | SVG card rendering: API data validation (V1-V6, 5 tests) + Vision MCP results (6 tests, requires Playwright + MiniMax); total 11 tests | `python test_codes/test_visual_svg_cards.py` |
-| `test_codes/test_device_query_dedup.py` | Device query dedup: parameter API (G1, 6), device list (G2, 5), database integrity (G3, 5), frontend contract (G4, 5), query/chart/export (G5, 5); 26 tests total | `python test_codes/test_device_query_dedup.py` |
-| `test_codes/test_schematic_layout.py` | Schematic layout CRUD (G1-G7, 30 tests): create/read/update/delete, duplicate, template system, soft delete, edge cases, large data (1000 devices), save/load cycle (G6), template application (G7) | `python test_codes/test_schematic_layout.py` |
-| `test_codes/test_document_management.py` | Document management: config API (G1, 4), system types (G2, 4), upload/list/rename/view CRUD (G3, 6), permission checks (G4, 4), cleanup (G5, 2); 20 tests total | `python test_codes/test_document_management.py` |
-| `test_codes/test_company_id_migration.py` | company_id migration: companies table structure (G1, 6), company_id columns (G2, 8), company_id filtering (G3, 5), login company_id (G4, 3), API backward compatibility (G5, 3); 25 tests total | `python test_codes/test_company_id_migration.py` |
+Full catalog (23 test files with coverage descriptions and run commands):
+→ See [memory/reference_test_catalog.md](memory/reference_test_catalog.md)
 
 ## Visual UI Testing (Playwright + Vision MCP)
 
