@@ -97,18 +97,33 @@ bash scripts/sync_claude_config.sh --push
 
 详见 [proxy-rules.md](proxy-rules.md) 和 [research_gitee_github_sync.md](../../docs/research_gitee_github_sync.md)
 
+### Skills 同步判断规则
+
+**只同步手动建立的 skills**，判断标准（三条全满足才同步）：
+
+| 条件 | 检查方法 | 说明 |
+|------|---------|------|
+| 不是 symlink | `ls -la ~/.claude/skills/` 中不以 `->` 开头 | symlink 指向 `~/.agents/skills/`，重装即可恢复 |
+| 无 git remote | `git -C ~/.claude/skills/<name> remote -v` 为空 | 有 remote 的直接 clone 恢复，不需要同步 |
+| 有 SKILL.md | `ls ~/.claude/skills/<name>/SKILL.md` 存在 | 无 SKILL.md 的目录结构不完整，跳过 |
+
+**不同步的三类**：
+1. **symlinks**（21 个）→ `~/.agents/skills/` 下的 npx marketplace 包，`npx skills add` 重装
+2. **有 git remote 的 clone**（如 `create-colleague`）→ `git clone` 恢复
+3. **无 SKILL.md 的目录**（如 `book2skills`）→ 结构不完整
+
 ### 同步范围
 
 | 包含 | 排除（原因） |
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
-| `rules/*.md`（19 个项目 rules） | `book2skills/`（第三方安装的 skills） |
-| `skills/*/SKILL.md`（14 个项目自建 skills） | `create-colleague/`（第三方安装的 skills） |
-| — | `context-research/`（第三方安装的 skills） |
-| — | `baidu-search/`（第三方安装的 skills） |
-| — | `excalidraw-diagram-generator/`（第三方安装的 skills） |
-| `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（第三方 symlink，npx 管理） |
-| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`（第三方 symlink）、`baidu-search/`（第三方安装） |
+| `rules/*.md`（19 个项目 rules） | `settings.json`（含 GitHub PAT） |
+| `project/skills/`（12 个项目自建 skills） | `create-colleague/`（有 git remote，clone 恢复） |
+| `global/skills/`（5 个手动建立的全局 skills） | `book2skills/`（无 SKILL.md） |
+| `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（74 个 npx 包，symlink，重装恢复） |
+| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`, `baidu-search/`（symlink） |
+
+**global/skills 当前 5 个**（手动建立，无 git remote）：`context-research`, `doublecheck`, `excalidraw-diagram-generator`, `find-skills`, `graphify`
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -119,6 +134,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-28] 新增 Skills 同步判断规则（三条件：非 symlink + 无 git remote + 有 SKILL.md）；global/skills 新增 5 个手动建立的 skills（context-research, doublecheck, excalidraw-diagram-generator, find-skills, graphify）
 - [2026-04-28] 规则重组：全局 rules 37→18（通用），项目 rules 37→19（项目专用），消除双重加载（节省 ~27,600 token/会话）；同步范围更新：rules 37→19 项目 rules
 - [2026-04-22] 新增 excalidraw-diagram-generator 到排除清单（第三方安装，5 个）
 - [2026-04-26] 更新同步范围：rules 35→37（+cross-model-workflow.md +goal-backward.md），skills 自建 12→14（+ralph +prd）
