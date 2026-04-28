@@ -16,7 +16,7 @@
 
 Note: The PostToolUse Edit|Write hook in settings.json auto-triggers these skills for SVG/CSS/JS/mermaid files. This table documents the mapping; the hook handles enforcement.
 
-For mermaid rendering and quality rules, see [mermaid.md](mermaid.md).
+For mermaid rendering and quality rules, see `~/.claude/rules/mermaid.md` (global rule).
 
 **Rule: SVG/JS/CSS rendering code changed = you MUST run `/visual-check` before commit. No exceptions.**
 

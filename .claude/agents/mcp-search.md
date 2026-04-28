@@ -16,7 +16,7 @@ memory: user
 
 # MCP Documentation Search Agent (v2)
 
-Multi-source parallel search with cross-validation. Follows [search-workflow.md](../.claude/rules/search-workflow.md) for full workflow rules.
+Multi-source parallel search with cross-validation. Follows `~/.claude/rules/search-workflow.md` (global rule) for full workflow rules.
 
 ## Search Pipeline
 
