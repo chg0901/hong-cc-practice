@@ -103,3 +103,73 @@ done
 - [ ] 精简 xxx.md（~Y tokens 可节省）
 - [ ] 修复 yyy 计数不一致
 ```
+
+### 7. 修复指引
+
+发现问题后，按严重性顺序修复：
+
+#### 🔴 双重加载修复（最优先）
+
+**Rules 双重加载**：
+
+```bash
+# 确认哪边是权威版本
+diff ~/.claude/rules/xxx.md .claude/rules/xxx.md
+
+# 判断标准：
+# - 内容引用项目路径（smart_energy.db、D:/Proj/energy/）→ 项目专用，删全局
+# - 通用方法论，不引用项目路径 → 全局，删项目
+rm ~/.claude/rules/xxx.md   # 删全局（项目专用 rule）
+# 或
+rm .claude/rules/xxx.md     # 删项目（通用 rule）
+```
+
+**Skills 双重加载**（Windows symlink 陷阱）：
+
+```bash
+# 必须用 ls -la 检查，普通 ls 看不出 symlink
+ls -la .claude/skills/<name>
+ls -la ~/.claude/skills/<name>
+
+# 项目目录中的 skills 应该是 symlinks（-> ~/.claude/skills/<name>）
+# 如果项目目录有真实 SKILL.md（非 symlink），说明有双重加载
+
+# 正确状态：
+# ~/.claude/skills/<name>/SKILL.md  ← 真实文件
+# .claude/skills/<name>             ← symlink 指向上面
+
+# 修复：从 hong-cc-practice 备份恢复真实目录到 ~/.claude/skills/
+# 不要直接删除 ~/.claude/skills/<name>，会破坏项目 symlinks
+cp -r ~/.claude-github/hong-cc-practice/project/skills/<name> ~/.claude/skills/<name>
+```
+
+#### 🟡 计数不一致修复
+
+```bash
+# 获取实际数量
+echo "Global rules:" && ls ~/.claude/rules/*.md | wc -l
+echo "Project rules:" && ls .claude/rules/*.md | wc -l
+echo "Project skills:" && ls .claude/skills/ | wc -l
+echo "Memory files:" && ls memory/*.md | grep -v MEMORY.md | wc -l
+```
+
+更新 `subagents.md` 中的 L2 Rules 行、L3 Skills 行、Memory 文件数。
+更新 `config-review.md` 中的同步范围表。
+更新 `memory/MEMORY.md` 索引（新增/删除对应行）。
+
+#### 🟡 文件超限修复
+
+```bash
+# 找出可移出的内容（列表/速查表/触发矩阵）
+# 1. 创建 memory/reference_xxx.md，写入被移出的内容
+# 2. 在原文件中替换为一行指针：→ 见 memory/reference_xxx.md
+# 3. 裁剪 ChangeLogs（保留最近 5 条）
+# 4. 验证
+wc -l <file> && wc -c <file>
+```
+
+精简策略优先级：
+1. 移出到 Memory（详细列表/速查表）
+2. 裁剪 ChangeLogs（保留最近 5 条）
+3. 删除与其他 rule 重复的内容（留指针）
+4. 拆分文件（内容超过 2 个独立主题时）

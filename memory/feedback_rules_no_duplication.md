@@ -22,6 +22,7 @@ originSessionId: 836cb3d4-b894-4748-bd6d-60c75ed2f1ad
 - 包含项目特定数据（API 端点、数据库表结构）→ 项目专属
 - 通用方法论/工具用法（Mermaid 规范、搜索工作流、上下文管理）→ 全局
 
-**当前状态（2026-04-28）**：
-- 全局 18 个 rules（`~/.claude/rules/`）：boris-cherny-tips, context-hygiene, context-management, cross-model-workflow, daily-review, design-templates, deviation-handling, fireworks-tech-graph, friday-review, github-mcp-workflow, goal-backward, mermaid, search-workflow, todo-tracking, training, user-manual, visual-long-screenshot, zhihu-article
+**当前状态（2026-04-29 context-audit 修复后）**：
+- 全局 19 个 rules（`~/.claude/rules/`）：boris-cherny-tips, context-hygiene, context-management, cross-model-workflow, daily-review, design-templates, deviation-handling, fireworks-tech-graph, friday-review, github-mcp-workflow, goal-backward, mermaid, search-workflow, todo-tracking, token-budget, training, user-manual, visual-long-screenshot, zhihu-article
 - 项目 19 个 rules（`.claude/rules/`）：api-endpoints, config-review, database, database-patterns, data-scripts, extension-onboarding, file-migration, graphify, manual-testing, mcp-servers, proxy-rules, secrets, subagents, svg-design, terminal, testing, visual-testing, workflow, work-summary-rules
+- **Skills 双重加载**同样适用此规则：见 `feedback_skills_symlink_audit.md`

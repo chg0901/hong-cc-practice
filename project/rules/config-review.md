@@ -124,7 +124,7 @@ bash scripts/sync_claude_config.sh --push
 
 **global/skills 当前 5 个**（手动建立，无 git remote）：`context-research`, `doublecheck`, `excalidraw-diagram-generator`, `find-skills`, `graphify`
 
-**项目专用 skills 当前 12 个**：`visual-check`, `interaction-check`, `graphify-workflow`, `manual-review`, `long-screenshot`, `doc-trim`, `ps-script-dev`, `db-optimization`, `spike`, `ralph`, `prd`, `context-audit`
+**项目专用 skills 当前 13 个**：`visual-check`, `interaction-check`, `graphify-workflow`, `manual-review`, `long-screenshot`, `doc-trim`, `ps-script-dev`, `db-optimization`, `spike`, `ralph`, `prd`, `context-audit`, `five-layer-add`
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -135,6 +135,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-29] 新增 five-layer-add skill（项目专用 12→13）+ five-layer-integrity.md rule（项目 rules 19→20）
 - [2026-04-29] context-audit 修复：删除 13 个双重加载 skills（11 个从 ~/.claude/skills/ 删除，2 个从项目目录删除）；项目专用 skills 重新定义为 12 个；排除清单更新（移除 create-colleague/fireworks-tech-graph/baidu-search，新增 book-study/code-review-expert/sigma/skill-forge/wiki-ingest/web-access）
 - [2026-04-28] 新增 Skills 同步判断规则（三条件：非 symlink + 无 git remote + 有 SKILL.md）；global/skills 新增 5 个手动建立的 skills（context-research, doublecheck, excalidraw-diagram-generator, find-skills, graphify）
 - [2026-04-28] 规则重组：全局 rules 37→18（通用），项目 rules 37→19（项目专用），消除双重加载（节省 ~27,600 token/会话）；同步范围更新：rules 37→19 项目 rules

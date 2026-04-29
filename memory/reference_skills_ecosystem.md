@@ -1,8 +1,8 @@
 ---
 name: Skills ecosystem reference
-description: 16 skills 全景图（+excalidraw-diagram-generator 2026-04-22）+ 58 DESIGN.md 模板库（非 skill），Skill→Task 速查，安装后 onboarding 流程，工具链协作
+description: Skills 全景图（2026-04-29 context-audit 修复后）：12 项目专用 + 5 global + 7 第三方安装。Skill→Task 速查，三工具图表分工，symlink 审计规则。
 type: reference
-originSessionId: 85b62cf5-e098-4ce2-b282-fb41489b8bb7
+originSessionId: 16243a13-138c-42c6-abb6-b9d2c6f71e3c
 ---
 # Skills Ecosystem Quick Reference
 
@@ -26,13 +26,18 @@ originSessionId: 85b62cf5-e098-4ce2-b282-fb41489b8bb7
 | "长截图" | `long-screenshot` | 脚本调用 | **项目自建** |
 | "像 Stripe/Apple 风格" | DESIGN.md 模板 | 读取 `D:/Proj/design-templates/` | **参考库**（非 skill） |
 
-## Skills 分类
+## Skills 分类（2026-04-29 context-audit 修复后）
 
-**项目自建（9 个，同步到 GitHub）**：visual-check, interaction-check, graphify-workflow, manual-review, long-screenshot, doc-trim, context-research, book2skills, create-colleague
+**项目专用 Skills（12 个，`~/.claude/skills/` 真实目录，`.claude/skills/` symlinks，同步到 GitHub）**：
+visual-check, interaction-check, graphify-workflow, manual-review, long-screenshot, doc-trim, ps-script-dev, db-optimization, spike, ralph, prd, context-audit
 
-**第三方 clone/npm（5 个，不同步）**：book2skills, create-colleague, context-research, baidu-search, excalidraw-diagram-generator
+**Global Skills（5 个，`~/.claude/skills/` 真实目录，无 git remote，同步到 hong-cc-practice/global/skills/）**：
+context-research, doublecheck, excalidraw-diagram-generator, find-skills, graphify
 
-**第三方 symlink（7 个，npx 管理，不同步）**：book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph, web-access
+**第三方安装 Skills（7 个，`.agents/skills/` 下，symlink 管理，不同步）**：
+book-study, code-review-expert, sigma, skill-forge, wiki-ingest, fireworks-tech-graph, web-access
+
+**注意**：`create-colleague` 有 git remote（github.com/titanwings/colleague-skill），直接 clone 恢复，不同步。`book2skills` 无 SKILL.md，跳过。
 
 ## 三工具图表分工（2026-04-22 修正 CLI 工具）
 

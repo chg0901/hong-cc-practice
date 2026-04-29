@@ -25,19 +25,22 @@
 - [Five-layer ripple consistency](feedback_five_layer_ripple.md) — 一个变更波及 4+ 层文件，config-review 需覆盖 docs/mermaid，GRAPH_REPORT.md 为 graphify 唯一权威源
 - [PS script pitfalls](feedback_ps_script_pitfalls.md) — here-string 闭合必须 column 0、引号剥除用临时 .py 文件、.ps1 只用 ASCII 英文
 - [SQLite optimization patterns](feedback_db_optimization.md) — 窗口函数陷阱、OR IS NULL 反模式、字符串→数字 FK 迁移、AJAX 并行化；复用 /db-optimization skill
-- [Rules no duplication](feedback_rules_no_duplication.md) — Rules 不得同时存在于全局和项目目录（双重加载灾难），分类标准，当前 18+19 状态
+- [Rules no duplication](feedback_rules_no_duplication.md) — Rules/Skills 不得双重加载，分类标准，当前 19+19 状态（2026-04-29 修复）
+- [Skills symlink audit trap](feedback_skills_symlink_audit.md) — Windows `ls -la` 必须检查 symlink；删 `~/.claude/skills/` 会破坏项目 symlinks；正确修复方案
 
 ## Project (architecture decisions)
 - [CLAUDE.md restructured](project_claudemd_structure.md) — API/LSTM/changelog moved to rules files (2026-04-04)
 - [device_params dedup fix](project_device_params_dedup.md) — 365 duplicate rows cleaned; three-layer defense (DB+API+frontend)
 - [Long screenshot tools](project_long_screenshot.md) — 4-level Playwright screenshot strategy; main.content non-body scroll container; viewport expansion method
+- [frpc external access port fix](project_frpc_port_fix.md) — getApiBaseUrl() 丢失端口 bug 修复（2026-04-28）；frpc 映射 43000→5000, 43001→5002
+- [Deployment infrastructure](project_deployment_infrastructure.md) — Dockerfile, install scripts, build_package.sh, PyInstaller spec 新增（2026-04-29）
 
 ## Reference (external resources)
 - [MCP servers quick reference](reference_mcp_servers.md) — Task-to-MCP mapping, cross-validation strategy; full catalog in rules
 - [Search workflow](reference_search_workflow.md) — Tool Tier 0-4, parallel combos, confidence levels, report template; full rules in search-workflow.md
 - [Zhipu MCP workflows](reference_zhipu_mcp_workflows.md) — Search->Read pipeline, vision trio, GitHub 3-step exploration
 - [GitHub .claude/ config repo](reference_github_claude_config.md) — github.com/chg0901/hong-cc-practice, sync script, dual-repo maintenance
-- [Skills ecosystem](reference_skills_ecosystem.md) — 16 skills 全景图（+excalidraw-diagram-generator 2026-04-22），三工具图表分工，Skill→Task 速查
+- [Skills ecosystem](reference_skills_ecosystem.md) — 12 项目专用 + 5 global + 7 第三方（2026-04-29 修复），三工具图表分工，Skill→Task 速查
 - [fireworks-tech-graph](reference_fireworks_tech_graph.md) — SVG+PNG 技术图 skill; 7 styles, 14 types; Windows 用 Playwright wrapper 替代 rsvg-convert
 - [Design templates](reference_design_templates.md) — 58 品牌设计系统 DESIGN.md 模板库; 与现有设计 Skill 决策矩阵
 - [GitHub MCP quick ref](reference_github_mcp.md) — 26 tools overview, tool selection decision tree, 4 workflow templates; full guide in docs/github_mcp_guide.md
