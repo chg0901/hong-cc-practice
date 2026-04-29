@@ -118,12 +118,13 @@ bash scripts/sync_claude_config.sh --push
 |------|-------------|
 | `agents/*.md`（4 个项目 agents） | `settings.local.json`（含 API tokens） |
 | `rules/*.md`（19 个项目 rules） | `settings.json`（含 GitHub PAT） |
-| `project/skills/`（12 个项目自建 skills） | `create-colleague/`（有 git remote，clone 恢复） |
-| `global/skills/`（5 个手动建立的全局 skills） | `book2skills/`（无 SKILL.md） |
+| `project/skills/`（12 个项目专用 skills） | `book2skills/`（无 SKILL.md） |
+| `global/skills/`（5 个手动建立的全局 skills） | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `web-access/`（第三方安装，不同步） |
 | `settings.json`（hooks 配置，无敏感信息） | `.agents/skills/*`（74 个 npx 包，symlink，重装恢复） |
-| — | `book-study/`, `code-review-expert/`, `sigma/`, `skill-forge/`, `wiki-ingest/`, `fireworks-tech-graph/`, `web-access/`, `baidu-search/`（symlink） |
 
 **global/skills 当前 5 个**（手动建立，无 git remote）：`context-research`, `doublecheck`, `excalidraw-diagram-generator`, `find-skills`, `graphify`
+
+**项目专用 skills 当前 12 个**：`visual-check`, `interaction-check`, `graphify-workflow`, `manual-review`, `long-screenshot`, `doc-trim`, `ps-script-dev`, `db-optimization`, `spike`, `ralph`, `prd`, `context-audit`
 
 同步脚本：[scripts/sync_claude_config.sh](../../scripts/sync_claude_config.sh)
 本地 clone：`$HOME/.claude-github/hong-cc-practice/`
@@ -134,6 +135,7 @@ bash scripts/sync_claude_config.sh --push
 
 ## ChangeLogs
 
+- [2026-04-29] context-audit 修复：删除 13 个双重加载 skills（11 个从 ~/.claude/skills/ 删除，2 个从项目目录删除）；项目专用 skills 重新定义为 12 个；排除清单更新（移除 create-colleague/fireworks-tech-graph/baidu-search，新增 book-study/code-review-expert/sigma/skill-forge/wiki-ingest/web-access）
 - [2026-04-28] 新增 Skills 同步判断规则（三条件：非 symlink + 无 git remote + 有 SKILL.md）；global/skills 新增 5 个手动建立的 skills（context-research, doublecheck, excalidraw-diagram-generator, find-skills, graphify）
 - [2026-04-28] 规则重组：全局 rules 37→18（通用），项目 rules 37→19（项目专用），消除双重加载（节省 ~27,600 token/会话）；同步范围更新：rules 37→19 项目 rules
 - [2026-04-22] 新增 excalidraw-diagram-generator 到排除清单（第三方安装，5 个）
