@@ -43,3 +43,4 @@
 - [GitHub MCP quick ref](reference_github_mcp.md) — 26 tools overview, tool selection decision tree, 4 workflow templates; full guide in docs/github_mcp_guide.md
 - [MCP Server Catalog](reference_mcp_catalog.md) — 26+ servers inventory, auth configs, per-server tools, cache locations (extracted from mcp-servers.md)
 - [Test file catalog](reference_test_catalog.md) — 23 test files with coverage descriptions and run commands (extracted from testing.md)
+- [Superpowers 触发矩阵](reference_superpowers_matrix.md) — 13 个 superpowers skills 触发时机和协作链（从 subagents.md 移出）
